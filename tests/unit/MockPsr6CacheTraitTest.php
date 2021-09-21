@@ -63,11 +63,11 @@ class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
     public function provideVariousCacheItemContent()
     {
         return array(
-            'foobar and getKey' => [ 'foo', 'bar', array('getKey' => true) ],
-            'foobar and expiresAfter 99' => [ 'foo', 'bar', array('expiresAfter' => 99) ],
+            'foobar and getKey'            => [ 'foo', 'bar', array('getKey'       => true) ],
+            'foobar and expiresAfter 99'   => [ 'foo', 'bar', array('expiresAfter' => 99) ],
             'foobar and expiresAfter TRUE' => [ 'foo', 'bar', array('expiresAfter' => true) ],
-            'foobar and isHit' => [ 'foo', 'bar', array('getKey' => true, 'isHit' => true) ],
-            'foobar and set' => [ 'foo', 'bar', array('getKey' => true, 'set' => true) ],
+            'foobar and isHit'             => [ 'foo', 'bar', array('getKey'       => true, 'isHit' => true) ],
+            'foobar and set'               => [ 'foo', 'bar', array('getKey'       => true, 'set'   => true) ],
         );
     }
 
