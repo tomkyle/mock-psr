@@ -9,7 +9,7 @@
 ## Installation
 
 ```bash
-$ composer require tomkyle/mock-psr
+$ composer require --dev tomkyle/mock-psr
 ```
 
 ## Usage
