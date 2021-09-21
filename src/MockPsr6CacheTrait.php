@@ -22,8 +22,7 @@ trait MockPsr6CacheTrait
             $key = $key ? Argument::exact($key) : Argument::type('string');
             $cache->getItem($key)->willReturn($cache_item);
             $cache->hasItem($key)->willReturn(true);
-        }
-        elseif (is_array($cache_item)) {
+        } elseif (is_array($cache_item)) {
             foreach ($cache_item as $key => $item) {
                 if (!$item instanceof Cache\CacheItemInterface) {
                     $item = $this->mockCacheItem($item, [ 'getKey' => $key ]);
