@@ -58,32 +58,31 @@ trait MockPsr6CacheTrait
             $cache_item->getKey()->willReturn($get_value);
         endif;
 
-        if (isset($options['isHit'])):
-            $cache_item->isHit()->willReturn((bool) $options['isHit']);
-        endif;
+        if (isset($options['isHit'])) {
+            $isHit = (bool) $options['isHit'];
+            $cache_item->isHit()->willReturn($isHit);
+        }
 
-        if ($set_value = $options['set'] ?? false):
-            if (is_string($set_value)):
-                $cache_item->set($set_value)->shouldBeCalled(); else:
-                $cache_item->set(Argument::any())->shouldBeCalled();
-        endif;
-        endif;
+        if (isset($options['set'])) {
+            $set_value = $options['set'] ?? false;
+            $set_value = is_string($set_value) ? $set_value : Argument::type('string');
+            $cache_item->set($set_value)->shouldBeCalled();
+        }
 
-        if ($expires_value = $options['expiresAfter'] ?? false):
-            if (is_int($expires_value)):
-                $cache_item->expiresAfter($expires_value)->shouldBeCalled(); else:
-                $cache_item->expiresAfter(Argument::any())->shouldBeCalled();
-        endif;
-        endif;
+        if (isset($options['expiresAfter'])) {
+            $expires_value = $options['expiresAfter'];
+            $expires_value = is_int($expires_value) ? $expires_value : Argument::type('int');
+            $cache_item->expiresAfter($expires_value)->shouldBeCalled();
+        }
 
         return $cache_item->reveal();
     }
 
 
 
-    public function mockMissingCacheItem(array $options = array())
+    public function mockMissingCacheItem($item_content, array $options = array())
     {
-        return $this->createCacheItem(array_merge($options, [
+        return $this->mockCacheItem($item_content, array_merge($options, [
             'isHit' => false
         ]));
     }

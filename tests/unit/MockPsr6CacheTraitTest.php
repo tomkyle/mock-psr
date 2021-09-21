@@ -17,6 +17,16 @@ class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
 
 
 
+    public function testMockMissingCacheItem()
+    {
+        $cache_item = $this->mockMissingCacheItem("missing");
+
+        $this->assertInstanceOf( CacheItemInterface::class, $cache_item);
+        $this->assertFalse( $cache_item->isHit());
+
+    }
+
+
     /**
      * @dataProvider provideVariousCacheItemContent
      */
@@ -26,12 +36,38 @@ class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
 
         $this->assertInstanceOf( CacheItemInterface::class, $cache_item);
         $this->assertEquals( $content, $cache_item->get());
+
+        if (isset($options['isHit'])) {
+            $isHit = (bool) $options['isHit'];
+            if ($isHit) {
+                $this->assertTrue( $cache_item->isHit());
+            } else {
+                $this->assertFalse( $cache_item->isHit());
+            }
+        }
+
+        if (isset($options['expiresAfter'])) {
+            $expires_value = $options['expiresAfter'];
+            $expires_value = is_int($expires_value) ? $expires_value : 100;
+            $cache_item->expiresAfter($expires_value);
+        }
+        if (isset($options['set'])) {
+            $set_value = $options['set'];
+            $set_value = is_string($set_value) ? $set_value : "foo";
+            $cache_item->set($set_value);
+        }
+
     }
+
 
     public function provideVariousCacheItemContent()
     {
         return array(
-            'foobar' => [ 'foo', 'bar', array('getKey' => true) ]
+            'foobar and getKey' => [ 'foo', 'bar', array('getKey' => true) ],
+            'foobar and expiresAfter 99' => [ 'foo', 'bar', array('expiresAfter' => 99) ],
+            'foobar and expiresAfter TRUE' => [ 'foo', 'bar', array('expiresAfter' => true) ],
+            'foobar and isHit' => [ 'foo', 'bar', array('getKey' => true, 'isHit' => true) ],
+            'foobar and set' => [ 'foo', 'bar', array('getKey' => true, 'set' => true) ],
         );
     }
 
