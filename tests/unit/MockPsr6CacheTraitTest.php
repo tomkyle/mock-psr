@@ -20,9 +20,10 @@ class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider provideVariousCacheItemContent
      */
-    public function testMockCacheItem( $key, $content )
+    public function testMockCacheItem( $key, $content, $options )
     {
-        $cache_item = $this->mockCacheItem($content);
+        $cache_item = $this->mockCacheItem($content, $options);
+
         $this->assertInstanceOf( CacheItemInterface::class, $cache_item);
         $this->assertEquals( $content, $cache_item->get());
     }
@@ -30,7 +31,7 @@ class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
     public function provideVariousCacheItemContent()
     {
         return array(
-            'foobar' => [ 'foo', 'bar' ]
+            'foobar' => [ 'foo', 'bar', array('getKey' => true) ]
         );
     }
 
