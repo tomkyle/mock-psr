@@ -36,4 +36,24 @@ class MockPsr15RequestHandlerTraitTest extends \PHPUnit\Framework\TestCase
             'No response defined' => [ null ]
         );
     }
+
+
+    /**
+     * @dataProvider provideVariousExceptionResponses
+     */
+    public function testMockRequestHandlerWithExceptions( $e )
+    {
+        $handler = $this->mockRequestHandler($e);
+        $server_request = $this->mockServerRequest();
+        $this->expectException( get_class($e) );
+        $handler->handle( $server_request );
+    }
+
+    public function provideVariousExceptionResponses()
+    {
+        return array(
+            'Simple Exception' => [ new \Exception("Exception!") ],
+            'RuntimeException' => [ new \RuntimeException("RuntimeException!") ],
+        );
+    }
 }
