@@ -1,6 +1,6 @@
 {
     "name": "tomkyle/mock-psr",
-    "description": "PHP Package boilerplate",
+    "description": "Traits for mocking common PSR components in PhpUnit tests",
 
     "authors": [{
         "name": "Carsten Witt",
