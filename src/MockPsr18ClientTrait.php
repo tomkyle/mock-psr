@@ -15,18 +15,13 @@ trait MockPsr18ClientTrait
         MockPsr7MessagesTrait;
 
 
-    public function mockClient( ResponseInterface $response = null ) : ClientInterface
+    public function mockClient(ResponseInterface $response = null) : ClientInterface
     {
         $response = $response ?: $this->mockResponse();
 
-        $client_mock = $this->prophesize( ClientInterface::class );
-        $client_mock->sendRequest( Argument::type(RequestInterface::class))->willReturn( $response );
+        $client_mock = $this->prophesize(ClientInterface::class);
+        $client_mock->sendRequest(Argument::type(RequestInterface::class))->willReturn($response);
 
         return $client_mock->reveal();
     }
-
-
 }
-
-
-
