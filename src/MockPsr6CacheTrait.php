@@ -18,28 +18,35 @@ trait MockPsr6CacheTrait
         $cache = $this->prophesize(Cache\CacheItemPoolInterface::class);
 
         if ($cache_item instanceof Cache\CacheItemInterface) {
-            $cache->getItem(Argument::type('string'))->willReturn($cache_item);
-        } elseif (is_array($cache_item)) {
+            $key = $cache_item->getKey();
+            $key = $key ? Argument::exact($key) : Argument::type('string');
+
+            $cache->getItem(Argument::exact($key))->willReturn($cache_item);
+            $cache->hasItem(Argument::exact($key))->willReturn(true);
+        }
+        elseif (is_array($cache_item)) {
             foreach ($cache_item as $key => $item) {
                 if (!$item instanceof Cache\CacheItemInterface) {
                     $item = $this->mockCacheItem($item, [ 'getKey' => $key ]);
                 }
-                $cache->getItem(Argument::exact($cache_item->getKey()))->willReturn($item);
+                $key = $item->getKey();
+                $cache->getItem(Argument::exact($key))->willReturn($item);
+                $cache->hasItem(Argument::exact($key))->willReturn(true);
             }
         } elseif ($cache_item) {
             throw new \InvalidArgumentException("CacheItemInterface expected");
         }
 
         if ($options['save'] ?? false) {
-            $cache->save(Argument::any())->shouldBeCalled();
+            $cache->save(Argument::type(Cache\CacheItemInterface::class))->shouldBeCalled();
         }
 
         if (isset($options['clear'])) {
-            $cache->clear()->willReturn((bool) $options['clear']);
+            $cache->clear()->shouldBeCalled()->willReturn((bool) $options['clear']);
         }
 
         if (isset($options['hasItem'])) {
-            $cache->hasItem()->willReturn((bool) $options['hasItem']);
+            $cache->hasItem(Argument::type('string'))->willReturn((bool) $options['hasItem']);
         }
 
 

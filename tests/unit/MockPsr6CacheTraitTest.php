@@ -76,18 +76,31 @@ class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider provideVariousCacheItems
      */
-    public function testMockCacheItemPool( $cache_item )
+    public function testMockCacheItemPool( $cache_item, $options )
     {
-        $cache = $this->mockCacheItemPool($cache_item);
+        $cache = $this->mockCacheItemPool($cache_item, $options);
         $this->assertInstanceOf( CacheItemPoolInterface::class, $cache);
+
+        if ($options['save'] ?? false) {
+            $cache->save($cache_item);
+        }
+        if (isset($options['clear'])) {
+            $this->assertEquals($options['clear'], $cache->clear());
+        }
+
+        $this->assertInstanceOf( CacheItemPoolInterface::class, $cache);
+
     }
 
     public function provideVariousCacheItems()
     {
         $cache_item = $this->mockCacheItem("QuxBaz");
         return array(
-            'No item defined' => [ null ],
-            'CacheItem mock' => [ $cache_item ]
+            'No item defined' => [ null, array() ],
+            'CacheItem mock' => [ $cache_item, array() ],
+            'CacheItem mock and save' => [ $cache_item, array('save' => true) ],
+            'CacheItem mock and clear' => [ $cache_item, array('clear' => true) ],
+            'CacheItem per array' => [ ['one' => $cache_item, 'two' => "ItemValue"], array('clear' => true) ]
         );
     }
 
