@@ -6,6 +6,37 @@
 
 
 
+## Usage
+
+```php
+<?php
+use tomkyle\MockPsr\MockPsr3ContainerTrait;
+use tomkyle\MockPsr\MockPsr6CacheTrait;
+use tomkyle\MockPsr\MockPsr7MessagesTrait;
+use tomkyle\MockPsr\MockPsr15RequestHandlerTrait;
+use tomkyle\MockPsr\MockPsr18ClientTrait;  
+```
+
+## Example
+
+```php
+<?php
+use tomkyle\MockPsr\MockPsr7MessagesTrait;
+
+class SomeUnitTest extends \PHPUnit\Framework\TestCase
+{
+    use MockPsr7MessagesTrait;
+ 
+  	public function testSomething() 
+    {
+        // Psr\Http\Message\RequestInterface
+      	$request = $this->mockRequest("GET", "/home");
+    }
+}
+
+
+```
+
 
 
 ## Unit tests and development
