@@ -34,13 +34,13 @@ use tomkyle\MockPsr\MockPsr7MessagesTrait;
 class SomeUnitTest extends \PHPUnit\Framework\TestCase
 {
     use MockPsr7MessagesTrait;
- 
+
     public function testSomething() 
     {
         // Psr\Http\Message\ServerRequestInterface
         $server_request = $this->mockServerRequest();
         $attributes = array();
-        headers = array();
+        $headers = array();
         $server_request = $this->mockServerRequest($attributes, $headers);
       
         // Psr\Http\Message\UriInterface
@@ -71,7 +71,7 @@ use tomkyle\MockPsr\MockPsr18ClientTrait;
 class SomeUnitTest extends \PHPUnit\Framework\TestCase
 {
     use MockPsr18ClientTrait;
- 
+
     public function testSomething() 
     {
         // Psr\Http\Client\ClientInterface
@@ -94,7 +94,7 @@ use tomkyle\MockPsr\MockPsr15RequestHandlerTrait;
 class SomeUnitTest extends \PHPUnit\Framework\TestCase
 {
     use MockPsr15RequestHandlerTrait;
- 
+
     public function testSomething() 
     {
         // Psr\Http\Server\RequestHandlerInterface
@@ -115,7 +115,7 @@ use tomkyle\MockPsr\MockPsr3ContainerTrait;
 class SomeUnitTest extends \PHPUnit\Framework\TestCase
 {
     use MockPsr3ContainerTrait;
- 
+
     public function testSomething() 
     {
         // sr\Container\ContainerInterface
