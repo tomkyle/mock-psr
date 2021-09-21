@@ -6,6 +6,12 @@
 
 
 
+## Installation
+
+```bash
+$ composer require tomkyle/mock-psr
+```
+
 ## Usage
 
 ```php
