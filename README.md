@@ -20,6 +20,7 @@ use tomkyle\MockPsr\MockPsr3ContainerTrait;
 use tomkyle\MockPsr\MockPsr6CacheTrait;
 use tomkyle\MockPsr\MockPsr7MessagesTrait;
 use tomkyle\MockPsr\MockPsr15RequestHandlerTrait;
+use tomkyle\MockPsr\MockPsr17FactoriesTrait;
 use tomkyle\MockPsr\MockPsr18ClientTrait;  
 ```
 
@@ -105,6 +106,36 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
      }
 }
 ```
+
+### PSR-17 HTTP Factory
+
+Includes *MockPsr7MessagesTrait*
+
+```php
+<?php
+use tomkyle\MockPsr\MockPsr17FactoriesTrait;
+
+class SomeUnitTest extends \PHPUnit\Framework\TestCase
+{
+    use MockPsr17FactoriesTrait;
+ 
+  	public function testSomething() 
+    {
+        // Psr\Http\Message\RequestFactoryInterface
+      	$request_factory = $this->mockRequestFactory();
+        $request = $this->mockRequest("GET", "/");
+        $request_factory = $this->mockRequestFactory($request);
+
+
+				// Psr\Http\Message\ResponseFactoryInterface
+      	$response_factory = $this->mockResponseFactory();
+        $response = $this->mockResponse(404, "body string");
+      	$response_factory = $this->mockResponseFactory($response);
+    }
+}
+```
+
+
 
 ### PSR-3 Container
 
