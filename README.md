@@ -19,6 +19,8 @@ use tomkyle\MockPsr\MockPsr18ClientTrait;
 
 ## Example
 
+### PSR-7 Messages
+
 ```php
 <?php
 use tomkyle\MockPsr\MockPsr7MessagesTrait;
@@ -29,12 +31,95 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
  
   	public function testSomething() 
     {
+        // Psr\Http\Message\ServerRequestInterface
+        $server_request = $this->mockServerRequest();
+        $attributes = array();
+        headers = array();      
+        $server_request = $this->mockServerRequest($attributes, $headers);
+      
+        // Psr\Http\Message\UriInterface
+        $uri = $this->mockUri("https://test.com");
+
         // Psr\Http\Message\RequestInterface
-      	$request = $this->mockRequest("GET", "/home");
-    }
+      	$request = $this->mockRequest("GET", $uri);
+        $request = $this->mockRequest("GET", "/home");
+      
+        // Psr\Http\Message\StreamInterface
+        $stream = $this->mockStream("body string");
+      
+        // Psr\Http\Message\ResponseInterface
+        $response = $this->mockResponse(200, $stream);
+        $response = $this->mockResponse(404, "body string");
+     }
 }
+```
 
+### PSR-18 HTTP Client
 
+Includes *MockPsr7MessagesTrait*
+
+```php
+<?php
+use tomkyle\MockPsr\MockPsr18ClientTrait;
+
+class SomeUnitTest extends \PHPUnit\Framework\TestCase
+{
+    use MockPsr18ClientTrait;
+ 
+  	public function testSomething() 
+    {
+        // Psr\Http\Client\ClientInterface
+      	$client = $this->mockClient();
+      
+        $response = $this->mockResponse(404, "body string");
+        $client = $this->mockClient( $response );
+     }
+}
+```
+
+### PSR-15 RequestHandler
+
+Includes *MockPsr7MessagesTrait*
+
+```php
+<?php
+use tomkyle\MockPsr\MockPsr15RequestHandlerTrait;
+
+class SomeUnitTest extends \PHPUnit\Framework\TestCase
+{
+    use MockPsr15RequestHandlerTrait;
+ 
+  	public function testSomething() 
+    {
+        // Psr\Http\Server\RequestHandlerInterface
+      	$request_handler = $this->mockRequestHandler();
+      
+        $response = $this->mockResponse(404, "body string");
+        $request_handler = $this->mockRequestHandler( $response );
+     }
+}
+```
+
+### PSR-3 Container
+
+```php
+<?php
+use tomkyle\MockPsr\MockPsr3ContainerTrait;
+
+class SomeUnitTest extends \PHPUnit\Framework\TestCase
+{
+    use MockPsr3ContainerTrait;
+ 
+  	public function testSomething() 
+    {
+        // sr\Container\ContainerInterface
+      	$container = $this->mockContainer();
+        $container = $this->mockContainer([
+        	'foo' => 'bar',
+          'qux' => 'baz'        
+        ]);
+     }
+}
 ```
 
 
