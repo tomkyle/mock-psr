@@ -60,29 +60,6 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 }
 ```
 
-### PSR-18 HTTP Client
-
-Includes *MockPsr7MessagesTrait*
-
-```php
-<?php
-use tomkyle\MockPsr\MockPsr18ClientTrait;
-
-class SomeUnitTest extends \PHPUnit\Framework\TestCase
-{
-	use MockPsr18ClientTrait;
-
-	public function testSomething() 
-	{
-		// Psr\Http\Client\ClientInterface
-		$client = $this->mockClient();
-
-		$response = $this->mockResponse(404, "body string");
-		$client = $this->mockClient( $response );
-	}
-}
-```
-
 ### PSR-15 RequestHandler
 
 Includes *MockPsr7MessagesTrait*
@@ -106,6 +83,59 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 }
 ```
 
+### PSR-17 HTTP Factories
+
+Includes *MockPsr7MessagesTrait*
+
+```php
+<?php
+use tomkyle\MockPsr\MockPsr17FactoriesTrait;
+
+class SomeUnitTest extends \PHPUnit\Framework\TestCase
+{
+	use MockPsr17FactoriesTrait;
+
+	public function testSomething() 
+	{
+    // Psr\Http\Message\RequestFactoryInterface
+    $request_factory = $this->mockRequestFactory();
+    
+    $request = $this->mockRequest();
+    $request_factory = $this->mockRequestFactory( $request );
+    
+    
+    // Psr\Http\Message\ResponseFactoryInterface
+    $response_factory = $this->mockResponseFactory();
+    
+    $response = $this->mockResponse(404, "body string");
+    $response_factory = $this->mockResponseFactory( $response );
+	}
+}
+```
+
+### PSR-18 HTTP Client
+
+Includes *MockPsr7MessagesTrait*
+
+```php
+<?php
+use tomkyle\MockPsr\MockPsr18ClientTrait;
+
+class SomeUnitTest extends \PHPUnit\Framework\TestCase
+{
+	use MockPsr18ClientTrait;
+
+	public function testSomething() 
+	{
+		// Psr\Http\Client\ClientInterface
+		$client = $this->mockClient();
+
+		$response = $this->mockResponse(404, "body string");
+		$client = $this->mockClient( $response );
+	}
+}
+```
+
 ### PSR-3 Container
 
 ```php
@@ -118,7 +148,7 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 
 	public function testSomething() 
 	{
-		// sr\Container\ContainerInterface
+		// Psr\Container\ContainerInterface
 		$container = $this->mockContainer();
 		$container = $this->mockContainer([
 				'foo' => 'bar',
