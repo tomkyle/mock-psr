@@ -1,7 +1,7 @@
 <?php
 namespace tests;
 
-use tomkyle\MockPsr\MockPsr3ContainerTrait;
+use tomkyle\MockPsr\MockPsr11ContainerTrait;
 
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -9,11 +9,11 @@ use Psr\Container\NotFoundExceptionInterface;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 
-class MockPsr3ContainerTraitTest extends \PHPUnit\Framework\TestCase
+class MockPsr11ContainerTraitTest extends \PHPUnit\Framework\TestCase
 {
     use ProphecyTrait,
         // SUT
-        MockPsr3ContainerTrait;
+        MockPsr11ContainerTrait;
 
 
     /**

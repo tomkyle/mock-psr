@@ -60,6 +60,28 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 }
 ```
 
+### PSR-11 Container
+
+```php
+<?php
+use tomkyle\MockPsr\MockPsr11ContainerTrait;
+
+class SomeUnitTest extends \PHPUnit\Framework\TestCase
+{
+	use MockPsr11ContainerTrait;
+
+	public function testSomething() 
+	{
+		// Psr\Container\ContainerInterface
+		$container = $this->mockContainer();
+		$container = $this->mockContainer([
+				'foo' => 'bar',
+			'qux' => 'baz'        
+		]);
+	}
+}
+```
+
 ### PSR-15 RequestHandler
 
 Includes *MockPsr7MessagesTrait*
@@ -132,28 +154,6 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 
 		$response = $this->mockResponse(404, "body string");
 		$client = $this->mockClient( $response );
-	}
-}
-```
-
-### PSR-3 Container
-
-```php
-<?php
-use tomkyle\MockPsr\MockPsr3ContainerTrait;
-
-class SomeUnitTest extends \PHPUnit\Framework\TestCase
-{
-	use MockPsr3ContainerTrait;
-
-	public function testSomething() 
-	{
-		// Psr\Container\ContainerInterface
-		$container = $this->mockContainer();
-		$container = $this->mockContainer([
-				'foo' => 'bar',
-			'qux' => 'baz'        
-		]);
 	}
 }
 ```

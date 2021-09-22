@@ -7,7 +7,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 
-trait MockPsr3ContainerTrait
+trait MockPsr11ContainerTrait
 {
     use ProphecyTrait;
 
