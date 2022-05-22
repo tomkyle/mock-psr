@@ -59,9 +59,9 @@ trait MockPsr6CacheTrait
         $cache_item = $this->prophesize(Cache\CacheItemInterface::class);
         $cache_item->get()->willReturn($item_content);
 
-        if ($get_value = $options['getKey'] ?? false):
-            $cache_item->getKey()->willReturn($get_value);
-        endif;
+        // if ($get_value = $options['getKey'] ?? false):
+            $cache_item->getKey()->willReturn($options['getKey'] ?? "keyname");
+        // endif;
 
         if (isset($options['isHit'])) {
             $isHit = (bool) $options['isHit'];
@@ -71,13 +71,13 @@ trait MockPsr6CacheTrait
         if (isset($options['set'])) {
             $set_value = $options['set'] ?? false;
             $set_value = is_string($set_value) ? $set_value : Argument::type('string');
-            $cache_item->set($set_value)->shouldBeCalled();
+            $cache_item->set($set_value)->willReturn($cache_item);
         }
 
         if (isset($options['expiresAfter'])) {
             $expires_value = $options['expiresAfter'];
             $expires_value = is_int($expires_value) ? $expires_value : Argument::type('int');
-            $cache_item->expiresAfter($expires_value)->shouldBeCalled();
+            $cache_item->expiresAfter($expires_value)->willReturn($cache_item);
         }
 
         return $cache_item->reveal();

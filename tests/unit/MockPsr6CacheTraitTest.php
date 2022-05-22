@@ -96,11 +96,11 @@ class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
     {
         $cache_item = $this->mockCacheItem("QuxBaz");
         return array(
-            'No item defined' => [ null, array() ],
-            'CacheItem mock' => [ $cache_item, array() ],
-            'CacheItem mock and save' => [ $cache_item, array('save' => true) ],
+            'Without CacheItem'        => [ null, array() ],
+            'CacheItem mock'           => [ $cache_item, array() ],
+            'CacheItem mock and save'  => [ $cache_item, array('save'  => true) ],
             'CacheItem mock and clear' => [ $cache_item, array('clear' => true) ],
-            'CacheItem per array' => [ ['one' => $cache_item, 'two' => "ItemValue"], array('clear' => true) ]
+            'CacheItem per array'      => [ ['one' => $cache_item, 'two' => "ItemValue"], array('clear' => true) ]
         );
     }
 
