@@ -38,7 +38,7 @@
 
     "require-dev": {
         "guzzlehttp/guzzle": "^7.0",
-        "symfony/cache": "^5.0",
+        "symfony/cache": "^5.0|^6.0",
 
         "phpunit/phpunit": "^9.0",
         "phpspec/prophecy-phpunit": "^2.0",
