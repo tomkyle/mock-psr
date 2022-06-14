@@ -16,7 +16,7 @@ $ composer require --dev tomkyle/mock-psr
 
 ```php
 <?php
-use tomkyle\MockPsr\MockPsr3ContainerTrait;
+use tomkyle\MockPsr\MockPsr11ContainerTrait;
 use tomkyle\MockPsr\MockPsr6CacheTrait;
 use tomkyle\MockPsr\MockPsr7MessagesTrait;
 use tomkyle\MockPsr\MockPsr15RequestHandlerTrait;
@@ -62,6 +62,8 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 
 ### PSR-11 Container
 
+Pass an optional array with things the Container has; calling *has* and *get* methods will behave like expected, including throwing `Psr\Container\NotFoundExceptionInterface`.
+
 ```php
 <?php
 use tomkyle\MockPsr\MockPsr11ContainerTrait;
@@ -75,9 +77,13 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 		// Psr\Container\ContainerInterface
 		$container = $this->mockContainer();
 		$container = $this->mockContainer([
-				'foo' => 'bar',
+			'foo' => 'bar',
 			'qux' => 'baz'        
 		]);
+    
+		$container->has("foo"); // true
+		$container->has("hello"); // false
+		$container->get("hello"); // throws 'NotFoundExceptionInterface'
 	}
 }
 ```

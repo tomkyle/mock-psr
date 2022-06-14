@@ -1,65 +1,65 @@
 {
-    "name": "tomkyle/mock-psr",
-    "description": "Traits for mocking common PSR components in PhpUnit tests",
+	"name": "tomkyle/mock-psr",
+	"description": "Traits for mocking common PSR components in PhpUnit tests",
 
-    "authors": [{
-        "name": "Carsten Witt",
-        "email": "tomkyle@posteo.de",
-        "role": "Developer"
-    }],
+	"authors": [{
+		"name": "Carsten Witt",
+		"email": "tomkyle@posteo.de",
+		"role": "Developer"
+	}],
 
-    "license": "MIT",
+	"license": "MIT",
 
-    "autoload": {
-        "psr-4": {
-            "tomkyle\\MockPsr\\": "src/"
-        }
-    },
+	"autoload": {
+		"psr-4": {
+			"tomkyle\\MockPsr\\": "src/"
+		}
+	},
 
-    "autoload-dev": {
-        "psr-4": {
-            "tests\\": "tests/unit"
-        }
-    },
+	"autoload-dev": {
+		"psr-4": {
+			"tests\\": "tests/unit"
+		}
+	},
 
-    "require": {
-        "php": "^7.3|^8.0",
-        "psr/log": "^1.1|^2.0|^3.0",
-        "psr/cache": "^1.0|^2.0|^3.0",
-        "psr/container": "^1.0|^2.0",
-        "psr/http-factory": "^1.0",
-        "psr/http-client": "^1.0",
-        "phpunit/phpunit": "^9.0",
-        "phpspec/prophecy-phpunit": "^2.0",
-        "nyholm/psr7": "^1.4",
-        "psr/http-message": "^1.0",
-        "psr/http-server-handler": "^1.0"
-    },
+	"require": {
+		"php": "^7.3|^8.0",
+		"psr/log": "^1.1|^2.0|^3.0",
+		"psr/cache": "^1.0|^2.0|^3.0",
+		"psr/container": "^1.0|^2.0",
+		"psr/http-factory": "^1.0",
+		"psr/http-client": "^1.0",
+		"psr/http-message": "^1.0",
+		"psr/http-server-handler": "^1.0",
+		"phpunit/phpunit": "^9.0",
+		"phpspec/prophecy-phpunit": "^2.0",
+		"nyholm/psr7": "^1.4"
+	},
 
-    "require-dev": {
-        "guzzlehttp/guzzle": "^7.0",
-        "symfony/cache": "^5.0|^6.0",
+	"require-dev": {
+		"guzzlehttp/guzzle": "^7.0",
+		"symfony/cache": "^5.0|^6.0",
+		"phpunit/phpunit": "^9.0",
+		"phpspec/prophecy-phpunit": "^2.0",
+		"php-coveralls/php-coveralls": "^2.0",
+		"friendsofphp/php-cs-fixer": "^3.0",
+		"spatie/phpunit-watcher": "^1.0",
+		"phpstan/phpstan": "^1.0",
+		"laminas/laminas-log": "^2.15"
+	},
 
-        "phpunit/phpunit": "^9.0",
-        "phpspec/prophecy-phpunit": "^2.0",
-        "php-coveralls/php-coveralls": "^2.0",
-        "friendsofphp/php-cs-fixer": "^3.0",
-        "spatie/phpunit-watcher": "^1.0",
-        "phpstan/phpstan": "^1.0"
-    },
+	"scripts": {
+		"phpstan"     : "phpstan analyse --configuration phpstan.neon --no-progress -vvv",
+		"watch"       : "phpunit-watcher watch --testsuite unit --testdox",
 
-    "scripts": {
-        "phpstan"     : "phpstan analyse --configuration phpstan.neon --no-progress -vvv",
-        "watch"       : "phpunit-watcher watch",
+		"phpcs"       : "php-cs-fixer fix -v --diff --dry-run --allow-risky=yes src/",
+		"phpcs-apply" : "php-cs-fixer fix -vv --allow-risky=yes src/",
 
-        "phpcs"       : "php-cs-fixer fix -v --diff --dry-run --allow-risky=yes src/",
-        "phpcs-apply" : "php-cs-fixer fix -vv --allow-risky=yes src/",
+		"phpunit"     : "phpunit --coverage-text",
 
-        "phpunit"     : "phpunit --coverage-text",
-
-        "test": [
-            "@phpcs",
-            "@phpunit"
-        ]
-    }
+		"test": [
+			"@phpcs",
+			"@phpunit"
+		]
+	}
 }

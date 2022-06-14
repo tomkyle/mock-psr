@@ -10,6 +10,11 @@ trait MockPsr6CacheTrait
     use ProphecyTrait;
 
     /**
+     * @var string
+     */
+    protected $default_key_name = "keyname";
+
+    /**
      * @param  CacheItemPoolInterface|array $cache_item
      * @param  array  $options              CacheItemPool configuration
      */
@@ -19,10 +24,13 @@ trait MockPsr6CacheTrait
 
         if ($cache_item instanceof Cache\CacheItemInterface) {
             $key = $cache_item->getKey();
-            $key = $key ? Argument::exact($key) : Argument::type('string');
+            $key = ($key !== $this->default_key_name)
+                 ? Argument::exact($key) : Argument::type('string');
+
             $cache->getItem($key)->willReturn($cache_item);
             $cache->hasItem($key)->willReturn(true);
-        } elseif (is_array($cache_item)) {
+        }
+        elseif (is_array($cache_item)) {
             foreach ($cache_item as $key => $item) {
                 if (!$item instanceof Cache\CacheItemInterface) {
                     $item = $this->mockCacheItem($item, [ 'getKey' => $key ]);
@@ -31,7 +39,8 @@ trait MockPsr6CacheTrait
                 $cache->getItem(Argument::exact($key))->willReturn($item);
                 $cache->hasItem(Argument::exact($key))->willReturn(true);
             }
-        } elseif ($cache_item) {
+        }
+        elseif ($cache_item) {
             throw new \InvalidArgumentException("CacheItemInterface expected");
         }
 
@@ -60,7 +69,7 @@ trait MockPsr6CacheTrait
         $cache_item->get()->willReturn($item_content);
 
         // if ($get_value = $options['getKey'] ?? false):
-            $cache_item->getKey()->willReturn($options['getKey'] ?? "keyname");
+            $cache_item->getKey()->willReturn($options['getKey'] ?? $this->default_key_name);
         // endif;
 
         if (isset($options['isHit'])) {
