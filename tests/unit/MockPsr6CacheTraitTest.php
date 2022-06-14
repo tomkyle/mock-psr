@@ -5,8 +5,6 @@ use tomkyle\MockPsr\MockPsr6CacheTrait;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\CacheItemInterface;
-
-use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 
 class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
@@ -87,20 +85,29 @@ class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
         if (isset($options['clear'])) {
             $this->assertEquals($options['clear'], $cache->clear());
         }
-
-        $this->assertInstanceOf( CacheItemPoolInterface::class, $cache);
-
+        if ($cache_item instanceof CacheItemInterface) {
+            $cache_key = $cache_item->getKey();
+            $this->assertTrue($cache->hasItem($cache_key));
+            $this->assertEquals($cache_item, $cache->getItem($cache_key));
+        }
     }
+
 
     public function provideVariousCacheItems()
     {
         $cache_item = $this->mockCacheItem("QuxBaz");
+        $cache_item_with_certain_key = $this->mockCacheItem("FooBar", array('getKey' => "foo"));
+
         return array(
-            'Without CacheItem'        => [ null, array() ],
-            'CacheItem mock'           => [ $cache_item, array() ],
-            'CacheItem mock and save'  => [ $cache_item, array('save'  => true) ],
-            'CacheItem mock and clear' => [ $cache_item, array('clear' => true) ],
-            'CacheItem per array'      => [ ['one' => $cache_item, 'two' => "ItemValue"], array('clear' => true) ]
+            'Empty cache w/o CacheItem'      => [ null, array() ],
+            'CacheItem mock'                 => [ $cache_item, array() ],
+            'CacheItem mock w/ certain key'  => [ $cache_item_with_certain_key, array() ],
+            'CacheItem mock and save'        => [ $cache_item, array('save'  => true) ],
+            'CacheItem mock and clear'       => [ $cache_item, array('clear' => true) ],
+            'CacheItem per array'            => [ array(
+                'one' => $cache_item,
+                'two' => "ItemValue"
+            ), array('clear' => true) ]
         );
     }
 
