@@ -1,4 +1,5 @@
 <?php
+
 namespace tomkyle\MockPsr;
 
 use Psr\Container\ContainerInterface;
@@ -11,9 +12,9 @@ trait MockPsr11ContainerTrait
 {
     use ProphecyTrait;
 
-    public function mockContainer(array $items = array()) : ContainerInterface
+    public function mockContainer(array $items = array()): ContainerInterface
     {
-        $NF = new class() extends \Exception implements NotFoundExceptionInterface {
+        $NF = new class () extends \Exception implements NotFoundExceptionInterface {
         };
 
         $container_mock = $this->prophesize(ContainerInterface::class);

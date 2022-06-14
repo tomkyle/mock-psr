@@ -1,4 +1,5 @@
 <?php
+
 namespace tomkyle\MockPsr;
 
 use Psr\Http\Message\RequestFactoryInterface;
@@ -19,11 +20,11 @@ use Prophecy\Argument;
 
 trait MockPsr17FactoriesTrait
 {
-    use ProphecyTrait,
-        MockPsr7MessagesTrait;
+    use ProphecyTrait;
+    use MockPsr7MessagesTrait;
 
 
-    public function mockRequestFactory(RequestInterface $request = null) : RequestFactoryInterface
+    public function mockRequestFactory(RequestInterface $request = null): RequestFactoryInterface
     {
         $request = $request ?: $this->mockRequest("GET", "/");
 
@@ -33,7 +34,7 @@ trait MockPsr17FactoriesTrait
         return $factory_mock->reveal();
     }
 
-    public function mockResponseFactory(ResponseInterface $response = null) : ResponseFactoryInterface
+    public function mockResponseFactory(ResponseInterface $response = null): ResponseFactoryInterface
     {
         $response = $response ?: $this->mockResponse();
 

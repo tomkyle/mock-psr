@@ -53,7 +53,7 @@
 		"watch"       : "phpunit-watcher watch --testsuite unit --testdox",
 
 		"phpcs"       : "php-cs-fixer fix -v --diff --dry-run --allow-risky=yes src/",
-		"phpcs-apply" : "php-cs-fixer fix -vv --allow-risky=yes src/",
+		"phpcs:apply" : "php-cs-fixer fix -vv --allow-risky=yes src/",
 
 		"phpunit"     : "phpunit --coverage-text",
 
