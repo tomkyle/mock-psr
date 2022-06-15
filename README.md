@@ -21,9 +21,12 @@ use tomkyle\MockPsr\MockPsr6CacheTrait;
 use tomkyle\MockPsr\MockPsr7MessagesTrait;
 use tomkyle\MockPsr\MockPsr15RequestHandlerTrait;
 use tomkyle\MockPsr\MockPsr18ClientTrait;  
+
+# Bonus
+use tomkyle\MockPsr\MockPdoTrait;
 ```
 
-## Example
+## Examples
 
 ### PSR-7 Messages
 
@@ -80,7 +83,7 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 			'foo' => 'bar',
 			'qux' => 'baz'        
 		]);
-    
+
 		$container->has("foo"); // true
 		$container->has("hello"); // false
 		$container->get("hello"); // throws 'NotFoundExceptionInterface'
@@ -125,18 +128,18 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 
 	public function testSomething() 
 	{
-    // Psr\Http\Message\RequestFactoryInterface
-    $request_factory = $this->mockRequestFactory();
-    
-    $request = $this->mockRequest();
-    $request_factory = $this->mockRequestFactory( $request );
-    
-    
-    // Psr\Http\Message\ResponseFactoryInterface
-    $response_factory = $this->mockResponseFactory();
-    
-    $response = $this->mockResponse(404, "body string");
-    $response_factory = $this->mockResponseFactory( $response );
+		// Psr\Http\Message\RequestFactoryInterface
+		$request_factory = $this->mockRequestFactory();
+
+		$request = $this->mockRequest();
+		$request_factory = $this->mockRequestFactory( $request );
+
+
+		// Psr\Http\Message\ResponseFactoryInterface
+		$response_factory = $this->mockResponseFactory();
+
+		$response = $this->mockResponse(404, "body string");
+		$response_factory = $this->mockResponseFactory( $response );
 	}
 }
 ```
@@ -164,12 +167,38 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 }
 ```
 
+### PDO and PDOStatements
+
+```php
+<?php
+use tomkyle\MockPsr\MockPdoTrait;
+
+class SomeUnitTest extends \PHPUnit\Framework\TestCase
+{
+	use MockPdoTrait;
+
+	public function testSomething() 
+	{
+		// \PDOStatement
+		$execution_result = true;
+    $stmt = $this->mockPdoStatement($execution_result);
+    $stmt = $this->mockPdoStatement(true, array("foo" => "bar"));    
+
+    // \PDO
+    $pdo = $this->mockPdo();
+    $pdo = $this->mockPdo($stmt);   
+    
+    $stmt_2 = $pdo->prepare("SELECT");
+    $stmt_2 == $stmt
+	}
+}
+```
+
 
 
 ## Unit tests and development
 
-1. Copy `phpunit.xml.dist` to `phpunit.xml` 
-2. Run [PhpUnit](https://phpunit.de/) like this:
+Run [PhpUnit](https://phpunit.de/) like this:
 
 ```bash
 $ composer test

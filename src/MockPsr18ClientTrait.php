@@ -1,4 +1,5 @@
 <?php
+
 namespace tomkyle\MockPsr;
 
 use Psr\Http\Client\ClientInterface;
@@ -10,11 +11,11 @@ use Prophecy\Argument;
 
 trait MockPsr18ClientTrait
 {
-    use ProphecyTrait,
-        MockPsr7MessagesTrait;
+    use ProphecyTrait;
+    use MockPsr7MessagesTrait;
 
 
-    public function mockClient(ResponseInterface $response = null) : ClientInterface
+    public function mockClient(ResponseInterface $response = null): ClientInterface
     {
         $response = $response ?: $this->mockResponse();
 

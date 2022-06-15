@@ -1,4 +1,5 @@
 <?php
+
 namespace tomkyle\MockPsr;
 
 use Psr\Http\Message\ServerRequestInterface;
@@ -10,10 +11,10 @@ use Prophecy\PhpUnit\ProphecyTrait;
 
 trait MockPsr15RequestHandlerTrait
 {
-    use MockPsr7MessagesTrait,
-        ProphecyTrait;
+    use MockPsr7MessagesTrait;
+    use ProphecyTrait;
 
-    public function mockRequestHandler($response = null) : RequestHandlerInterface
+    public function mockRequestHandler($response = null): RequestHandlerInterface
     {
         $response = $response ?: $this->mockResponse();
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace tomkyle\MockPsr;
 
 use Psr\Cache;
@@ -29,8 +30,7 @@ trait MockPsr6CacheTrait
 
             $cache->getItem($key)->willReturn($cache_item);
             $cache->hasItem($key)->willReturn(true);
-        }
-        elseif (is_array($cache_item)) {
+        } elseif (is_array($cache_item)) {
             foreach ($cache_item as $key => $item) {
                 if (!$item instanceof Cache\CacheItemInterface) {
                     $item = $this->mockCacheItem($item, [ 'getKey' => $key ]);
@@ -39,8 +39,7 @@ trait MockPsr6CacheTrait
                 $cache->getItem(Argument::exact($key))->willReturn($item);
                 $cache->hasItem(Argument::exact($key))->willReturn(true);
             }
-        }
-        elseif ($cache_item) {
+        } elseif ($cache_item) {
             throw new \InvalidArgumentException("CacheItemInterface expected");
         }
 
@@ -69,7 +68,7 @@ trait MockPsr6CacheTrait
         $cache_item->get()->willReturn($item_content);
 
         // if ($get_value = $options['getKey'] ?? false):
-            $cache_item->getKey()->willReturn($options['getKey'] ?? $this->default_key_name);
+        $cache_item->getKey()->willReturn($options['getKey'] ?? $this->default_key_name);
         // endif;
 
         if (isset($options['isHit'])) {

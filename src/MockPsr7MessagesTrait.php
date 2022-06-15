@@ -1,4 +1,5 @@
 <?php
+
 namespace tomkyle\MockPsr;
 
 use Psr\Http\Message\RequestInterface;
@@ -13,7 +14,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 
 trait MockPsr7MessagesTrait
 {
-    public function mockServerRequest(array $attributes = array(), array $headers = array()) : ServerRequestInterface
+    public function mockServerRequest(array $attributes = array(), array $headers = array()): ServerRequestInterface
     {
         $request_mock = $this->prophesize(ServerRequestInterface::class);
 
@@ -27,15 +28,15 @@ trait MockPsr7MessagesTrait
     }
 
 
-    public function mockUri($uri) : UriInterface
+    public function mockUri($uri): UriInterface
     {
         return is_string($uri)
-        ? (new Nyholm\Psr7\Factory\Psr17Factory)->createUri($uri)
+        ? (new Nyholm\Psr7\Factory\Psr17Factory())->createUri($uri)
         : $uri;
     }
 
 
-    public function mockRequest(string $method, $uri) : RequestInterface
+    public function mockRequest(string $method, $uri): RequestInterface
     {
         $uri = $this->mockUri($uri);
 
@@ -47,7 +48,7 @@ trait MockPsr7MessagesTrait
     }
 
 
-    public function mockStream(string $body = '', array $options = array()) : StreamInterface
+    public function mockStream(string $body = '', array $options = array()): StreamInterface
     {
         $stream_mock = $this->prophesize(StreamInterface::class);
         $stream_mock->__toString()->willReturn($body);
@@ -60,7 +61,7 @@ trait MockPsr7MessagesTrait
     }
 
 
-    public function mockResponse(int $status = 200, $body = null) : ResponseInterface
+    public function mockResponse(int $status = 200, $body = null): ResponseInterface
     {
         $response_mock = $this->prophesize(ResponseInterface::class);
         $response_mock->getStatusCode()->willReturn($status);
