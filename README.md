@@ -80,7 +80,7 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 			'foo' => 'bar',
 			'qux' => 'baz'        
 		]);
-    
+
 		$container->has("foo"); // true
 		$container->has("hello"); // false
 		$container->get("hello"); // throws 'NotFoundExceptionInterface'
@@ -125,18 +125,18 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 
 	public function testSomething() 
 	{
-    // Psr\Http\Message\RequestFactoryInterface
-    $request_factory = $this->mockRequestFactory();
-    
-    $request = $this->mockRequest();
-    $request_factory = $this->mockRequestFactory( $request );
-    
-    
-    // Psr\Http\Message\ResponseFactoryInterface
-    $response_factory = $this->mockResponseFactory();
-    
-    $response = $this->mockResponse(404, "body string");
-    $response_factory = $this->mockResponseFactory( $response );
+		// Psr\Http\Message\RequestFactoryInterface
+		$request_factory = $this->mockRequestFactory();
+
+		$request = $this->mockRequest();
+		$request_factory = $this->mockRequestFactory( $request );
+
+
+		// Psr\Http\Message\ResponseFactoryInterface
+		$response_factory = $this->mockResponseFactory();
+
+		$response = $this->mockResponse(404, "body string");
+		$response_factory = $this->mockResponseFactory( $response );
 	}
 }
 ```
@@ -168,8 +168,7 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 
 ## Unit tests and development
 
-1. Copy `phpunit.xml.dist` to `phpunit.xml` 
-2. Run [PhpUnit](https://phpunit.de/) like this:
+Run [PhpUnit](https://phpunit.de/) like this:
 
 ```bash
 $ composer test
