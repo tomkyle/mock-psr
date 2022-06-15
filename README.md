@@ -21,9 +21,12 @@ use tomkyle\MockPsr\MockPsr6CacheTrait;
 use tomkyle\MockPsr\MockPsr7MessagesTrait;
 use tomkyle\MockPsr\MockPsr15RequestHandlerTrait;
 use tomkyle\MockPsr\MockPsr18ClientTrait;  
+
+# Bonus
+use tomkyle\MockPsr\MockPdoTrait;
 ```
 
-## Example
+## Examples
 
 ### PSR-7 Messages
 
@@ -160,6 +163,33 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 
 		$response = $this->mockResponse(404, "body string");
 		$client = $this->mockClient( $response );
+	}
+}
+```
+
+### PDO and PDOStatements
+
+```php
+<?php
+use tomkyle\MockPsr\MockPdoTrait;
+
+class SomeUnitTest extends \PHPUnit\Framework\TestCase
+{
+	use MockPdoTrait;
+
+	public function testSomething() 
+	{
+		// \PDOStatement
+		$execution_result = true;
+    $stmt = $this->mockPdoStatement($execution_result);
+    $stmt = $this->mockPdoStatement(true, array("foo" => "bar"));    
+
+    // \PDO
+    $pdo = $this->mockPdo();
+    $pdo = $this->mockPdo($stmt);   
+    
+    $stmt_2 = $pdo->prepare("SELECT");
+    $stmt_2 == $stmt
 	}
 }
 ```
