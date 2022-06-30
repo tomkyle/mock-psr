@@ -10,13 +10,13 @@ use Psr\Http\Message\UriInterface;
 
 use Nyholm;
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 trait MockPsr7MessagesTrait
 {
     public function mockServerRequest(array $attributes = array(), array $headers = array()): ServerRequestInterface
     {
-        $request_mock = $this->prophesize(ServerRequestInterface::class);
+        $prophet = new \Prophecy\Prophet;
+        $request_mock = $prophet->prophesize(ServerRequestInterface::class);
 
         foreach ($attributes as $name => $value) {
             $request_mock->getAttribute(Argument::exact($name))->willReturn($value);
@@ -38,9 +38,10 @@ trait MockPsr7MessagesTrait
 
     public function mockRequest(string $method, $uri): RequestInterface
     {
+        $prophet = new \Prophecy\Prophet;
         $uri = $this->mockUri($uri);
 
-        $request_mock = $this->prophesize(RequestInterface::class);
+        $request_mock = $prophet->prophesize(RequestInterface::class);
         $request_mock->getMethod()->willReturn($method);
         $request_mock->getUri()->willReturn($uri);
 
@@ -50,7 +51,8 @@ trait MockPsr7MessagesTrait
 
     public function mockStream(string $body = '', array $options = array()): StreamInterface
     {
-        $stream_mock = $this->prophesize(StreamInterface::class);
+        $prophet = new \Prophecy\Prophet;
+        $stream_mock = $prophet->prophesize(StreamInterface::class);
         $stream_mock->__toString()->willReturn($body);
 
         if ($options['write'] ?? false):
@@ -63,7 +65,8 @@ trait MockPsr7MessagesTrait
 
     public function mockResponse(int $status = 200, $body = null): ResponseInterface
     {
-        $response_mock = $this->prophesize(ResponseInterface::class);
+        $prophet = new \Prophecy\Prophet;
+        $response_mock = $prophet->prophesize(ResponseInterface::class);
         $response_mock->getStatusCode()->willReturn($status);
 
         if ($body instanceof StreamInterface) {

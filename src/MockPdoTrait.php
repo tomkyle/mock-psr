@@ -2,18 +2,15 @@
 namespace tomkyle\MockPsr;
 
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 trait MockPdoTrait
 {
     
-    use ProphecyTrait;
-    
-
-
     protected function mockPdoStatement( bool $execute_result, array $fetch_result = array(), array $error_info = array()) : \PDOStatement
     {
-        $stmt = $this->prophesize(\PDOStatement::class);
+        $prophet = new \Prophecy\Prophet;
+
+        $stmt = $prophet->prophesize(\PDOStatement::class);
 
         $stmt->setFetchMode( Argument::type('int'), Argument::any() )->willReturn( true );
 
@@ -38,8 +35,9 @@ trait MockPdoTrait
 
     protected function mockPdo( \PDOStatement $stmt_mock = null) : \PDO
     {
+        $prophet = new \Prophecy\Prophet;
         $stmt_mock = $stmt_mock ?: $this->mockPdoStatement(true);
-        $pdo = $this->prophesize(\PDO::class);
+        $pdo = $prophet->prophesize(\PDO::class);
         $pdo->prepare( Argument::type('string') )->willReturn( $stmt_mock );
         return $pdo->reveal();
     }

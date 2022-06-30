@@ -10,13 +10,11 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 class MockPsr15RequestHandlerTraitTest extends \PHPUnit\Framework\TestCase
 {
-    use ProphecyTrait,
-        // SUT
-        MockPsr15RequestHandlerTrait;
+    // SUT
+    use MockPsr15RequestHandlerTrait;
 
 
     /**

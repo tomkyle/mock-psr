@@ -4,12 +4,9 @@ namespace tomkyle\MockPsr;
 
 use Psr\Cache;
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 trait MockPsr6CacheTrait
 {
-    use ProphecyTrait;
-
     /**
      * @var string
      */
@@ -21,7 +18,8 @@ trait MockPsr6CacheTrait
      */
     public function mockCacheItemPool($cache_item = null, array $options = array())
     {
-        $cache = $this->prophesize(Cache\CacheItemPoolInterface::class);
+        $prophet = new \Prophecy\Prophet;
+        $cache = $prophet->prophesize(Cache\CacheItemPoolInterface::class);
 
         if ($cache_item instanceof Cache\CacheItemInterface) {
             $key = $cache_item->getKey();
@@ -64,7 +62,8 @@ trait MockPsr6CacheTrait
 
     public function mockCacheItem($item_content, array $options = array())
     {
-        $cache_item = $this->prophesize(Cache\CacheItemInterface::class);
+        $prophet = new \Prophecy\Prophet;
+        $cache_item = $prophet->prophesize(Cache\CacheItemInterface::class);
         $cache_item->get()->willReturn($item_content);
 
         // if ($get_value = $options['getKey'] ?? false):

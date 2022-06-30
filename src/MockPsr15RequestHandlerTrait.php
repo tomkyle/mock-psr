@@ -7,18 +7,16 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 trait MockPsr15RequestHandlerTrait
 {
     use MockPsr7MessagesTrait;
-    use ProphecyTrait;
 
     public function mockRequestHandler($response = null): RequestHandlerInterface
     {
         $response = $response ?: $this->mockResponse();
-
-        $handler_mock = $this->prophesize(RequestHandlerInterface::class);
+        $prophet = new \Prophecy\Prophet;
+        $handler_mock = $prophet->prophesize(RequestHandlerInterface::class);
 
         if ($response instanceof ResponseInterface) {
             $handler_mock->handle(Argument::type(ServerRequestInterface::class))->willReturn($response);

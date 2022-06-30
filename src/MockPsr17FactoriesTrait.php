@@ -14,21 +14,18 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
-
-use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Argument;
 
 trait MockPsr17FactoriesTrait
 {
-    use ProphecyTrait;
     use MockPsr7MessagesTrait;
 
 
     public function mockRequestFactory(RequestInterface $request = null): RequestFactoryInterface
     {
         $request = $request ?: $this->mockRequest("GET", "/");
-
-        $factory_mock = $this->prophesize(RequestFactoryInterface::class);
+        $prophet = new \Prophecy\Prophet;
+        $factory_mock = $prophet->prophesize(RequestFactoryInterface::class);
         $factory_mock->createRequest(Argument::type('string'), Argument::any())->willReturn($request);
 
         return $factory_mock->reveal();
@@ -37,8 +34,8 @@ trait MockPsr17FactoriesTrait
     public function mockResponseFactory(ResponseInterface $response = null): ResponseFactoryInterface
     {
         $response = $response ?: $this->mockResponse();
-
-        $factory_mock = $this->prophesize(ResponseFactoryInterface::class);
+        $prophet = new \Prophecy\Prophet;
+        $factory_mock = $prophet->prophesize(ResponseFactoryInterface::class);
         $factory_mock->createResponse()->willReturn($response);
         $factory_mock->createResponse(Argument::type('int'), Argument::any())->willReturn($response);
 

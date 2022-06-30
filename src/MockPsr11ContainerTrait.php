@@ -6,18 +6,16 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 trait MockPsr11ContainerTrait
 {
-    use ProphecyTrait;
 
     public function mockContainer(array $items = array()): ContainerInterface
     {
         $NF = new class () extends \Exception implements NotFoundExceptionInterface {
         };
-
-        $container_mock = $this->prophesize(ContainerInterface::class);
+        $prophet = new \Prophecy\Prophet;
+        $container_mock = $prophet->prophesize(ContainerInterface::class);
         $container_mock->has(Argument::any())->willReturn(false);
         $container_mock->get(Argument::any())->willThrow($NF);
 

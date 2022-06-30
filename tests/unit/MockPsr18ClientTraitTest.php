@@ -6,13 +6,11 @@ use tomkyle\MockPsr\MockPsr18ClientTrait;
 use Psr\Http\Client\ClientInterface;
 
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 class MockPsr18ClientTraitTest extends \PHPUnit\Framework\TestCase
 {
-    use ProphecyTrait,
-        // SUT
-        MockPsr18ClientTrait;
+    // SUT
+    use MockPsr18ClientTrait;
 
 
     /**
