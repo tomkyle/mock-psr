@@ -5,13 +5,11 @@ use tomkyle\MockPsr\MockPsr6CacheTrait;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\CacheItemInterface;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
 {
-    use ProphecyTrait,
-        // SUT
-        MockPsr6CacheTrait;
+    // SUT
+    use MockPsr6CacheTrait;
 
 
 

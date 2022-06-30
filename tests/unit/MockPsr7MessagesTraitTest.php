@@ -10,14 +10,11 @@ use Psr\Http\Message\UriInterface;
 use Psr\Http\Message\StreamInterface;
 
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 class MockPsr7MessagesTraitTest extends \PHPUnit\Framework\TestCase
 {
-    use ProphecyTrait,
-
-        // SUT
-        MockPsr7MessagesTrait;
+    // SUT
+    use MockPsr7MessagesTrait;
 
 
     /**

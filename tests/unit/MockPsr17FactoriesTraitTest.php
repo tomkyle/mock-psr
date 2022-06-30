@@ -17,13 +17,11 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 class MockPsr17FactoriesTraitTest extends \PHPUnit\Framework\TestCase
 {
-    use ProphecyTrait,
-        // SUT
-        MockPsr17FactoriesTrait;
+    // SUT
+    use MockPsr17FactoriesTrait;
 
 
     public function testMockRequestFactory()

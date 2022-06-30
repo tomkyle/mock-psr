@@ -3,13 +3,12 @@ namespace tests;
 
 use tomkyle\MockPsr\MockPdoTrait;
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 class MockPdoTraitTest extends \PHPUnit\Framework\TestCase
 {
-    use ProphecyTrait,
-        // SUT
-        MockPdoTrait;
+    // SUT
+    use    MockPdoTrait;
+
 
 
     /**

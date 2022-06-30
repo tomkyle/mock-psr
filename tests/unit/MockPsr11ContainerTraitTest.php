@@ -7,13 +7,11 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 class MockPsr11ContainerTraitTest extends \PHPUnit\Framework\TestCase
 {
-    use ProphecyTrait,
-        // SUT
-        MockPsr11ContainerTrait;
+    // SUT
+    use MockPsr11ContainerTrait;
 
 
     /**
