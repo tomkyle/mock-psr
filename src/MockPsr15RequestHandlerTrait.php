@@ -6,7 +6,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use Prophecy\Argument;
+use Prophecy;
 
 trait MockPsr15RequestHandlerTrait
 {
@@ -15,13 +15,12 @@ trait MockPsr15RequestHandlerTrait
     public function mockRequestHandler($response = null): RequestHandlerInterface
     {
         $response = $response ?: $this->mockResponse();
-        $prophet = new \Prophecy\Prophet;
-        $handler_mock = $prophet->prophesize(RequestHandlerInterface::class);
+        $handler_mock = (new Prophecy\Prophet)->prophesize(RequestHandlerInterface::class);
 
         if ($response instanceof ResponseInterface) {
-            $handler_mock->handle(Argument::type(ServerRequestInterface::class))->willReturn($response);
+            $handler_mock->handle(Prophecy\Argument::type(ServerRequestInterface::class))->willReturn($response);
         } elseif ($response instanceof \Throwable) {
-            $handler_mock->handle(Argument::type(ServerRequestInterface::class))->willThrow($response);
+            $handler_mock->handle(Prophecy\Argument::type(ServerRequestInterface::class))->willThrow($response);
         }
 
         return $handler_mock->reveal();

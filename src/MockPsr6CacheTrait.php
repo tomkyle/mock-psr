@@ -3,7 +3,7 @@
 namespace tomkyle\MockPsr;
 
 use Psr\Cache;
-use Prophecy\Argument;
+use Prophecy;
 
 trait MockPsr6CacheTrait
 {
@@ -18,13 +18,12 @@ trait MockPsr6CacheTrait
      */
     public function mockCacheItemPool($cache_item = null, array $options = array())
     {
-        $prophet = new \Prophecy\Prophet;
-        $cache = $prophet->prophesize(Cache\CacheItemPoolInterface::class);
+        $cache = (new Prophecy\Prophet)->prophesize(Cache\CacheItemPoolInterface::class);
 
         if ($cache_item instanceof Cache\CacheItemInterface) {
             $key = $cache_item->getKey();
             $key = ($key !== $this->default_key_name)
-                 ? Argument::exact($key) : Argument::type('string');
+                 ? Prophecy\Argument::exact($key) : Prophecy\Argument::type('string');
 
             $cache->getItem($key)->willReturn($cache_item);
             $cache->hasItem($key)->willReturn(true);
@@ -34,15 +33,15 @@ trait MockPsr6CacheTrait
                     $item = $this->mockCacheItem($item, [ 'getKey' => $key ]);
                 }
                 $key = $item->getKey();
-                $cache->getItem(Argument::exact($key))->willReturn($item);
-                $cache->hasItem(Argument::exact($key))->willReturn(true);
+                $cache->getItem(Prophecy\Argument::exact($key))->willReturn($item);
+                $cache->hasItem(Prophecy\Argument::exact($key))->willReturn(true);
             }
         } elseif ($cache_item) {
             throw new \InvalidArgumentException("CacheItemInterface expected");
         }
 
         if ($options['save'] ?? false) {
-            $cache->save(Argument::type(Cache\CacheItemInterface::class))->shouldBeCalled();
+            $cache->save(Prophecy\Argument::type(Cache\CacheItemInterface::class))->shouldBeCalled();
         }
 
         if (isset($options['clear'])) {
@@ -50,7 +49,7 @@ trait MockPsr6CacheTrait
         }
 
         if (isset($options['hasItem'])) {
-            $cache->hasItem(Argument::type('string'))->willReturn((bool) $options['hasItem']);
+            $cache->hasItem(Prophecy\Argument::type('string'))->willReturn((bool) $options['hasItem']);
         }
 
 
@@ -62,8 +61,7 @@ trait MockPsr6CacheTrait
 
     public function mockCacheItem($item_content, array $options = array())
     {
-        $prophet = new \Prophecy\Prophet;
-        $cache_item = $prophet->prophesize(Cache\CacheItemInterface::class);
+        $cache_item = (new Prophecy\Prophet)->prophesize(Cache\CacheItemInterface::class);
         $cache_item->get()->willReturn($item_content);
 
         // if ($get_value = $options['getKey'] ?? false):
@@ -77,13 +75,13 @@ trait MockPsr6CacheTrait
 
         if (isset($options['set'])) {
             $set_value = $options['set'] ?? false;
-            $set_value = is_string($set_value) ? $set_value : Argument::type('string');
+            $set_value = is_string($set_value) ? $set_value : Prophecy\Argument::type('string');
             $cache_item->set($set_value)->willReturn($cache_item);
         }
 
         if (isset($options['expiresAfter'])) {
             $expires_value = $options['expiresAfter'];
-            $expires_value = is_int($expires_value) ? $expires_value : Argument::type('int');
+            $expires_value = is_int($expires_value) ? $expires_value : Prophecy\Argument::type('int');
             $cache_item->expiresAfter($expires_value)->willReturn($cache_item);
         }
 

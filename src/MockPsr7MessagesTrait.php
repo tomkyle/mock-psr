@@ -9,20 +9,19 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 
 use Nyholm;
-use Prophecy\Argument;
+use Prophecy;
 
 trait MockPsr7MessagesTrait
 {
     public function mockServerRequest(array $attributes = array(), array $headers = array()): ServerRequestInterface
     {
-        $prophet = new \Prophecy\Prophet;
-        $request_mock = $prophet->prophesize(ServerRequestInterface::class);
+        $request_mock = (new Prophecy\Prophet)->prophesize(ServerRequestInterface::class);
 
         foreach ($attributes as $name => $value) {
-            $request_mock->getAttribute(Argument::exact($name))->willReturn($value);
+            $request_mock->getAttribute(Prophecy\Argument::exact($name))->willReturn($value);
         }
         foreach ($headers as $name => $value) {
-            $request_mock->getHeaderLine(Argument::exact($name))->willReturn($value);
+            $request_mock->getHeaderLine(Prophecy\Argument::exact($name))->willReturn($value);
         }
         return $request_mock->reveal();
     }
@@ -38,10 +37,9 @@ trait MockPsr7MessagesTrait
 
     public function mockRequest(string $method, $uri): RequestInterface
     {
-        $prophet = new \Prophecy\Prophet;
         $uri = $this->mockUri($uri);
 
-        $request_mock = $prophet->prophesize(RequestInterface::class);
+        $request_mock = (new Prophecy\Prophet)->prophesize(RequestInterface::class);
         $request_mock->getMethod()->willReturn($method);
         $request_mock->getUri()->willReturn($uri);
 
@@ -51,12 +49,11 @@ trait MockPsr7MessagesTrait
 
     public function mockStream(string $body = '', array $options = array()): StreamInterface
     {
-        $prophet = new \Prophecy\Prophet;
-        $stream_mock = $prophet->prophesize(StreamInterface::class);
+        $stream_mock = (new Prophecy\Prophet)->prophesize(StreamInterface::class);
         $stream_mock->__toString()->willReturn($body);
 
         if ($options['write'] ?? false):
-            $stream_mock->write(Argument::type('string'))->shouldBeCalled();
+            $stream_mock->write(Prophecy\Argument::type('string'))->shouldBeCalled();
         endif;
 
         return $stream_mock->reveal();
@@ -65,8 +62,7 @@ trait MockPsr7MessagesTrait
 
     public function mockResponse(int $status = 200, $body = null): ResponseInterface
     {
-        $prophet = new \Prophecy\Prophet;
-        $response_mock = $prophet->prophesize(ResponseInterface::class);
+        $response_mock = (new Prophecy\Prophet)->prophesize(ResponseInterface::class);
         $response_mock->getStatusCode()->willReturn($status);
 
         if ($body instanceof StreamInterface) {
