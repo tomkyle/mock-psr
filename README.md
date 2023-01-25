@@ -1,6 +1,7 @@
 <h1 align="center">tomkyle · Mock PSR</h1>
 
-<p align="center">Mock common PSR components in PhpUnit Tests.</p>
+**Mock common PSR components in PhpUnit Tests.**
+[![PHP Composer](https://github.com/tomkyle/mock-psr/actions/workflows/php.yml/badge.svg)](https://github.com/tomkyle/mock-psr/actions/workflows/php.yml)
 
 ---
 
