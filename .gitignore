@@ -45,6 +45,7 @@ Icon
 _schrott
 vendor
 node_modules
+phpstan.neon
 var/*
 logs/*
 tests/build/*
