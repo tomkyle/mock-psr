@@ -32,6 +32,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -41,7 +44,7 @@ jobs:
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v2
         with:
-          dependency-versions: ${{ matrix.dependency-versions }}
+          dependency-versions: highest
 
       - name: Run PHPUnit
         run: vendor/bin/phpunit tests
