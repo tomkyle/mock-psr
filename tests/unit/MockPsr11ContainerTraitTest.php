@@ -2,7 +2,7 @@
 namespace tests;
 
 use tomkyle\MockPsr\MockPsr11ContainerTrait;
-
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -14,9 +14,7 @@ class MockPsr11ContainerTraitTest extends \PHPUnit\Framework\TestCase
     use MockPsr11ContainerTrait;
 
 
-    /**
-     * @dataProvider provideContainerContentArray
-     */
+    #[DataProvider('provideContainerContentArray')]
     public function testMockContainer( $items )
     {
         $container = $this->mockContainer($items);
@@ -29,7 +27,7 @@ class MockPsr11ContainerTraitTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function provideContainerContentArray()
+    public static function provideContainerContentArray()
     {
         return array(
             'Empty container' => [ array() ],

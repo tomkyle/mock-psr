@@ -2,13 +2,13 @@
 namespace tests;
 
 use tomkyle\MockPsr\MockPsr7MessagesTrait;
-
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Http\Message\StreamInterface;
-
+use Prophecy;
 use Prophecy\Argument;
 
 class MockPsr7MessagesTraitTest extends \PHPUnit\Framework\TestCase
@@ -17,9 +17,7 @@ class MockPsr7MessagesTraitTest extends \PHPUnit\Framework\TestCase
     use MockPsr7MessagesTrait;
 
 
-    /**
-     * @dataProvider provideMethodsAndUris
-     */
+    #[DataProvider('provideMethodsAndUris')]
     public function testMockRequest($method, $uri)
     {
         $request = $this->mockRequest($method, $uri);
@@ -29,7 +27,7 @@ class MockPsr7MessagesTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf( UriInterface::class, $request->getUri());
     }
 
-    public function provideMethodsAndUris()
+    public static function provideMethodsAndUris()
     {
         $method = "GET";
         $uri = "/";
@@ -52,9 +50,7 @@ class MockPsr7MessagesTraitTest extends \PHPUnit\Framework\TestCase
 
 
 
-    /**
-     * @dataProvider provideAttributesAndHeaders
-     */
+    #[DataProvider('provideAttributesAndHeaders')]
     public function testMockServerRequest($attributes, $headers)
     {
         $request = $this->mockServerRequest($attributes, $headers);
@@ -70,7 +66,7 @@ class MockPsr7MessagesTraitTest extends \PHPUnit\Framework\TestCase
 
     }
 
-    public function provideAttributesAndHeaders()
+    public static function provideAttributesAndHeaders()
     {
         $attributes = array('foo' => 'bar');
         $headers = array('foo' => 'bar');
@@ -83,9 +79,7 @@ class MockPsr7MessagesTraitTest extends \PHPUnit\Framework\TestCase
 
 
 
-    /**
-     * @dataProvider provideReponseStatusCodes
-     */
+    #[DataProvider('provideReponseStatusCodes')]
     public function testMockResponse($status, $body)
     {
         if (is_null($status)) {
@@ -100,10 +94,14 @@ class MockPsr7MessagesTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals( $status, $response->getStatusCode() );
     }
 
-    public function provideReponseStatusCodes()
+    public static function provideReponseStatusCodes()
     {
+
         $body = "string";
-        $stream = $this->mockStream("String");
+        $stream_mock = (new Prophecy\Prophet)->prophesize(StreamInterface::class);
+        $stream_mock->__toString()->willReturn($body);
+        $stream = $stream_mock->reveal();
+
         return array(
             'Response with 200, with body string' => [ 200, $body ],
             'Response with 200, with body stream' => [ 200, $stream ],
