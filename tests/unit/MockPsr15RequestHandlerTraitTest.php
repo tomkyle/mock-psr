@@ -1,6 +1,7 @@
 <?php
 namespace tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use tomkyle\MockPsr\MockPsr15RequestHandlerTrait;
 use tomkyle\MockPsr\MockPsr7MessagesTrait;
 
@@ -8,7 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-
+use Prophecy;
 use Prophecy\Argument;
 
 class MockPsr15RequestHandlerTraitTest extends \PHPUnit\Framework\TestCase
@@ -16,29 +17,32 @@ class MockPsr15RequestHandlerTraitTest extends \PHPUnit\Framework\TestCase
     // SUT
     use MockPsr15RequestHandlerTrait;
 
+    protected $responseMock;
 
-    /**
-     * @dataProvider provideVariousResponses
-     */
+
+    #[DataProvider('provideVariousResponses')]
     public function testMockRequestHandler( $response )
     {
         $handler = $this->mockRequestHandler($response);
         $this->assertInstanceOf( RequestHandlerInterface::class, $handler);
     }
 
-    public function provideVariousResponses()
+    public static function provideVariousResponses()
     {
+        $response200 = (new Prophecy\Prophet)->prophesize(ResponseInterface::class);
+        $response200->getStatusCode()->willReturn(200);
+        $response400 = (new Prophecy\Prophet)->prophesize(ResponseInterface::class);
+        $response400->getStatusCode()->willReturn(400);
+
         return array(
-            'Response with 200' => [ $this->mockResponse() ],
-            'Response with 400' => [ $this->mockResponse(400) ],
+            'Response with 200' => [ $response200->reveal() ],
+            'Response with 400' => [ $response400->reveal() ],
             'No response defined' => [ null ]
         );
     }
 
 
-    /**
-     * @dataProvider provideVariousExceptionResponses
-     */
+    #[DataProvider('provideVariousExceptionResponses')]
     public function testMockRequestHandlerWithExceptions( $e )
     {
         $handler = $this->mockRequestHandler($e);
@@ -47,7 +51,7 @@ class MockPsr15RequestHandlerTraitTest extends \PHPUnit\Framework\TestCase
         $handler->handle( $server_request );
     }
 
-    public function provideVariousExceptionResponses()
+    public static function provideVariousExceptionResponses()
     {
         return array(
             'Simple Exception' => [ new \Exception("Exception!") ],

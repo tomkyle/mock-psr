@@ -2,9 +2,11 @@
 namespace tests;
 
 use tomkyle\MockPsr\MockPsr6CacheTrait;
-
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\CacheItemInterface;
+use Psr\Http\Message\ResponseInterface;
+use Prophecy;
 
 class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
 {
@@ -23,9 +25,7 @@ class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    /**
-     * @dataProvider provideVariousCacheItemContent
-     */
+    #[DataProvider('provideVariousCacheItemContent')]
     public function testMockCacheItem( $key, $content, $options )
     {
         $cache_item = $this->mockCacheItem($content, $options);
@@ -56,7 +56,7 @@ class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function provideVariousCacheItemContent()
+    public static function provideVariousCacheItemContent()
     {
         return array(
             'foobar and getKey'            => [ 'foo', 'bar', array('getKey'       => true) ],
@@ -69,9 +69,7 @@ class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
 
 
 
-    /**
-     * @dataProvider provideVariousCacheItems
-     */
+    #[DataProvider('provideVariousCacheItems')]
     public function testMockCacheItemPool( $cache_item, $options )
     {
         $cache = $this->mockCacheItemPool($cache_item, $options);
@@ -91,10 +89,18 @@ class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function provideVariousCacheItems()
+    public static function provideVariousCacheItems()
     {
-        $cache_item = $this->mockCacheItem("QuxBaz");
-        $cache_item_with_certain_key = $this->mockCacheItem("FooBar", array('getKey' => "foo"));
+
+        $cache_item_mock = (new Prophecy\Prophet)->prophesize(CacheItemInterface::class);
+        $cache_item_mock->get()->willReturn("QuxBaz");
+        $cache_item_mock->getKey()->willReturn("qux");
+        $cache_item = $cache_item_mock->reveal();
+
+        $cache_item_with_certain_key_mock = (new Prophecy\Prophet)->prophesize(CacheItemInterface::class);
+        $cache_item_with_certain_key_mock->get()->willReturn("FooBar");
+        $cache_item_with_certain_key_mock->getKey()->willReturn("foo");
+        $cache_item_with_certain_key = $cache_item_with_certain_key_mock->reveal();
 
         return array(
             'Empty cache w/o CacheItem'      => [ null, array() ],

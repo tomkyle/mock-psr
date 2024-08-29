@@ -24,19 +24,19 @@ trait MockPsr17FactoriesTrait
     public function mockRequestFactory(RequestInterface $request = null): RequestFactoryInterface
     {
         $request = $request ?: $this->mockRequest("GET", "/");
-        $factory_mock = (new Prophecy\Prophet)->prophesize(RequestFactoryInterface::class);
-        $factory_mock->createRequest(Prophecy\Argument::type('string'), Prophecy\Argument::any())->willReturn($request);
+        $objectProphecy = (new Prophecy\Prophet)->prophesize(RequestFactoryInterface::class);
+        $objectProphecy->createRequest(Prophecy\Argument::type('string'), Prophecy\Argument::any())->willReturn($request);
 
-        return $factory_mock->reveal();
+        return $objectProphecy->reveal();
     }
 
     public function mockResponseFactory(ResponseInterface $response = null): ResponseFactoryInterface
     {
         $response = $response ?: $this->mockResponse();
-        $factory_mock = (new Prophecy\Prophet)->prophesize(ResponseFactoryInterface::class);
-        $factory_mock->createResponse()->willReturn($response);
-        $factory_mock->createResponse(Prophecy\Argument::type('int'), Prophecy\Argument::any())->willReturn($response);
+        $objectProphecy = (new Prophecy\Prophet)->prophesize(ResponseFactoryInterface::class);
+        $objectProphecy->createResponse()->willReturn($response);
+        $objectProphecy->createResponse(Prophecy\Argument::type('int'), Prophecy\Argument::any())->willReturn($response);
 
-        return $factory_mock->reveal();
+        return $objectProphecy->reveal();
     }
 }

@@ -3,6 +3,7 @@ namespace tests;
 
 use tomkyle\MockPsr\MockPdoTrait;
 use Prophecy\Argument;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class MockPdoTraitTest extends \PHPUnit\Framework\TestCase
 {
@@ -10,10 +11,7 @@ class MockPdoTraitTest extends \PHPUnit\Framework\TestCase
     use    MockPdoTrait;
 
 
-
-    /**
-     * @dataProvider provideStatements
-     */
+    #[DataProvider('provideStatements')]
     public function testMockPdo( $stmt = null) : void
     {
         $pdo = $this->mockPdo($stmt);
@@ -24,7 +22,7 @@ class MockPdoTraitTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function provideStatements() : array
+    public static function provideStatements() : array
     {
         return array(
             'No parameters' => [  ],
@@ -32,9 +30,7 @@ class MockPdoTraitTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    /**
-     * @dataProvider provideStatementParameters
-     */
+    #[DataProvider('provideStatementParameters')]
     public function testMockPdoStatement( bool $execute_result, array $fetch_result = array(), array $error_info = array() ) : void
     {
         $stmt = $this->mockPdoStatement($execute_result, $fetch_result, $error_info);
@@ -59,7 +55,7 @@ class MockPdoTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($stmt->errorInfo(), $error_info);
     }
 
-    public function provideStatementParameters() : array
+    public static function provideStatementParameters() : array
     {
         return array(
             "execute yields 'true'" => [ true ],
