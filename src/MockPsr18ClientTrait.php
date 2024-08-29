@@ -16,9 +16,9 @@ trait MockPsr18ClientTrait
     {
         $response = $response ?: $this->mockResponse();
 
-        $client_mock = (new Prophecy\Prophet)->prophesize(ClientInterface::class);
-        $client_mock->sendRequest(Prophecy\Argument::type(RequestInterface::class))->willReturn($response);
+        $objectProphecy = (new Prophecy\Prophet)->prophesize(ClientInterface::class);
+        $objectProphecy->sendRequest(Prophecy\Argument::type(RequestInterface::class))->willReturn($response);
 
-        return $client_mock->reveal();
+        return $objectProphecy->reveal();
     }
 }

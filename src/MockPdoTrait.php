@@ -6,37 +6,37 @@ use Prophecy;
 trait MockPdoTrait
 {
     
-    protected function mockPdoStatement( bool $execute_result, array $fetch_result = array(), array $error_info = array()) : \PDOStatement
+    protected function mockPdoStatement( bool $execute_result, array $fetch_result = [], array $error_info = []) : \PDOStatement
     {
-        $stmt = (new Prophecy\Prophet)->prophesize(\PDOStatement::class);
+        $objectProphecy = (new Prophecy\Prophet)->prophesize(\PDOStatement::class);
 
-        $stmt->setFetchMode( Prophecy\Argument::type('int'), Prophecy\Argument::any() )->willReturn( true );
+        $objectProphecy->setFetchMode( Prophecy\Argument::type('int'), Prophecy\Argument::any() )->willReturn( true );
 
-        $stmt->execute( Prophecy\Argument::any() )->willReturn( $execute_result );
+        $objectProphecy->execute( Prophecy\Argument::any() )->willReturn( $execute_result );
 
-        $stmt->fetch()->willReturn( $execute_result ? $fetch_result : false );
+        $objectProphecy->fetch()->willReturn( $execute_result ? $fetch_result : false );
         // $stmt->fetch(Prophecy\Argument::type('int'))->willReturn( $fetch_result );
         // $stmt->fetch(Prophecy\Argument::type('int'), Prophecy\Argument::type('int'))->willReturn( $fetch_result );
         // $stmt->fetch(Prophecy\Argument::type('int'), Prophecy\Argument::type('int'), Prophecy\Argument::type('int'))->willReturn( $fetch_result );
         
-        $stmt->fetchAll( )->willReturn( $execute_result ? $fetch_result : array() );
+        $objectProphecy->fetchAll( )->willReturn( $execute_result ? $fetch_result : [] );
         // $stmt->fetchAll( Prophecy\Argument::type('int') )->willReturn( $fetch_result );
         // $stmt->fetchAll( Prophecy\Argument::type('int'), Prophecy\Argument::any() )->willReturn( $fetch_result );
         
-        $stmt->fetchObject()->willReturn( $execute_result ? (object) $fetch_result : false  );
+        $objectProphecy->fetchObject()->willReturn( $execute_result ? (object) $fetch_result : false  );
         // $stmt->fetchObject( Prophecy\Argument::type('string') )->willReturn( $fetch_result );
         
-        $stmt->errorInfo()->willReturn($error_info );
-        return $stmt->reveal();
+        $objectProphecy->errorInfo()->willReturn($error_info );
+        return $objectProphecy->reveal();
     }
 
 
-    protected function mockPdo( \PDOStatement $stmt_mock = null) : \PDO
+    protected function mockPdo( \PDOStatement $pdoStatement = null) : \PDO
     {
-        $stmt_mock = $stmt_mock ?: $this->mockPdoStatement(true);
-        $pdo = (new Prophecy\Prophet)->prophesize(\PDO::class);
-        $pdo->prepare( Prophecy\Argument::type('string') )->willReturn( $stmt_mock );
-        return $pdo->reveal();
+        $pdoStatement = $pdoStatement ?: $this->mockPdoStatement(true);
+        $objectProphecy = (new Prophecy\Prophet)->prophesize(\PDO::class);
+        $objectProphecy->prepare( Prophecy\Argument::type('string') )->willReturn( $pdoStatement );
+        return $objectProphecy->reveal();
     }
 
 }

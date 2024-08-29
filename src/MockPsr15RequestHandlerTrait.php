@@ -15,14 +15,14 @@ trait MockPsr15RequestHandlerTrait
     public function mockRequestHandler($response = null): RequestHandlerInterface
     {
         $response = $response ?: $this->mockResponse();
-        $handler_mock = (new Prophecy\Prophet)->prophesize(RequestHandlerInterface::class);
+        $objectProphecy = (new Prophecy\Prophet)->prophesize(RequestHandlerInterface::class);
 
         if ($response instanceof ResponseInterface) {
-            $handler_mock->handle(Prophecy\Argument::type(ServerRequestInterface::class))->willReturn($response);
+            $objectProphecy->handle(Prophecy\Argument::type(ServerRequestInterface::class))->willReturn($response);
         } elseif ($response instanceof \Throwable) {
-            $handler_mock->handle(Prophecy\Argument::type(ServerRequestInterface::class))->willThrow($response);
+            $objectProphecy->handle(Prophecy\Argument::type(ServerRequestInterface::class))->willThrow($response);
         }
 
-        return $handler_mock->reveal();
+        return $objectProphecy->reveal();
     }
 }

@@ -10,20 +10,20 @@ use Prophecy;
 trait MockPsr11ContainerTrait
 {
 
-    public function mockContainer(array $items = array()): ContainerInterface
+    public function mockContainer(array $items = []): ContainerInterface
     {
         $NF = new class () extends \Exception implements NotFoundExceptionInterface {
         };
-        $container_mock = (new Prophecy\Prophet)->prophesize(ContainerInterface::class);
-        $container_mock->has(Prophecy\Argument::any())->willReturn(false);
-        $container_mock->get(Prophecy\Argument::any())->willThrow($NF);
+        $objectProphecy = (new Prophecy\Prophet)->prophesize(ContainerInterface::class);
+        $objectProphecy->has(Prophecy\Argument::any())->willReturn(false);
+        $objectProphecy->get(Prophecy\Argument::any())->willThrow($NF);
 
         foreach ($items as $key => $item) {
-            $container_mock->has(Prophecy\Argument::exact($key))->willReturn(true);
-            $container_mock->get(Prophecy\Argument::exact($key))->willReturn($item);
+            $objectProphecy->has(Prophecy\Argument::exact($key))->willReturn(true);
+            $objectProphecy->get(Prophecy\Argument::exact($key))->willReturn($item);
         }
 
 
-        return $container_mock->reveal();
+        return $objectProphecy->reveal();
     }
 }
