@@ -1,44 +1,55 @@
 <?php
+
+/**
+ * This file is part of tomkyle/mock-psr
+ *
+ * Traits for mocking common PSR components in PhpUnit tests
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace tests;
 
-use tomkyle\MockPsr\MockPsr6CacheTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Psr\Cache\CacheItemPoolInterface;
-use Psr\Cache\CacheItemInterface;
-use Psr\Http\Message\ResponseInterface;
+use PHPUnit\Framework\TestCase;
 use Prophecy;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
+use tomkyle\MockPsr\MockPsr6CacheTrait;
 
-class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+class MockPsr6CacheTraitTest extends TestCase
 {
     // SUT
     use MockPsr6CacheTrait;
 
-
-
     public function testMockMissingCacheItem()
     {
-        $cache_item = $this->mockMissingCacheItem("missing");
+        $cache_item = $this->mockMissingCacheItem('missing');
 
-        $this->assertInstanceOf( CacheItemInterface::class, $cache_item);
-        $this->assertFalse( $cache_item->isHit());
-
+        $this->assertInstanceOf(CacheItemInterface::class, $cache_item);
+        $this->assertFalse($cache_item->isHit());
     }
 
-
     #[DataProvider('provideVariousCacheItemContent')]
-    public function testMockCacheItem( $key, $content, $options )
+    public function testMockCacheItem($key, $content, $options)
     {
         $cache_item = $this->mockCacheItem($content, $options);
 
-        $this->assertInstanceOf( CacheItemInterface::class, $cache_item);
-        $this->assertEquals( $content, $cache_item->get());
+        $this->assertInstanceOf(CacheItemInterface::class, $cache_item);
+        $this->assertEquals($content, $cache_item->get());
 
         if (isset($options['isHit'])) {
             $isHit = (bool) $options['isHit'];
             if ($isHit) {
-                $this->assertTrue( $cache_item->isHit());
+                $this->assertTrue($cache_item->isHit());
             } else {
-                $this->assertFalse( $cache_item->isHit());
+                $this->assertFalse($cache_item->isHit());
             }
         }
 
@@ -49,31 +60,27 @@ class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
         }
         if (isset($options['set'])) {
             $set_value = $options['set'];
-            $set_value = is_string($set_value) ? $set_value : "foo";
+            $set_value = is_string($set_value) ? $set_value : 'foo';
             $cache_item->set($set_value);
         }
-
     }
-
 
     public static function provideVariousCacheItemContent()
     {
-        return array(
-            'foobar and getKey'            => [ 'foo', 'bar', array('getKey'       => true) ],
-            'foobar and expiresAfter 99'   => [ 'foo', 'bar', array('expiresAfter' => 99) ],
-            'foobar and expiresAfter TRUE' => [ 'foo', 'bar', array('expiresAfter' => true) ],
-            'foobar and isHit'             => [ 'foo', 'bar', array('getKey'       => true, 'isHit' => true) ],
-            'foobar and set'               => [ 'foo', 'bar', array('getKey'       => true, 'set'   => true) ],
-        );
+        return [
+            'foobar and getKey' => ['foo', 'bar', ['getKey' => true]],
+            'foobar and expiresAfter 99' => ['foo', 'bar', ['expiresAfter' => 99]],
+            'foobar and expiresAfter TRUE' => ['foo', 'bar', ['expiresAfter' => true]],
+            'foobar and isHit' => ['foo', 'bar', ['getKey' => true, 'isHit' => true]],
+            'foobar and set' => ['foo', 'bar', ['getKey' => true, 'set' => true]],
+        ];
     }
 
-
-
     #[DataProvider('provideVariousCacheItems')]
-    public function testMockCacheItemPool( $cache_item, $options )
+    public function testMockCacheItemPool($cache_item, $options)
     {
         $cache = $this->mockCacheItemPool($cache_item, $options);
-        $this->assertInstanceOf( CacheItemPoolInterface::class, $cache);
+        $this->assertInstanceOf(CacheItemPoolInterface::class, $cache);
 
         if ($options['save'] ?? false) {
             $cache->save($cache_item);
@@ -88,31 +95,28 @@ class MockPsr6CacheTraitTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-
     public static function provideVariousCacheItems()
     {
-
-        $cache_item_mock = (new Prophecy\Prophet)->prophesize(CacheItemInterface::class);
-        $cache_item_mock->get()->willReturn("QuxBaz");
-        $cache_item_mock->getKey()->willReturn("qux");
+        $cache_item_mock = (new Prophecy\Prophet())->prophesize(CacheItemInterface::class);
+        $cache_item_mock->get()->willReturn('QuxBaz');
+        $cache_item_mock->getKey()->willReturn('qux');
         $cache_item = $cache_item_mock->reveal();
 
-        $cache_item_with_certain_key_mock = (new Prophecy\Prophet)->prophesize(CacheItemInterface::class);
-        $cache_item_with_certain_key_mock->get()->willReturn("FooBar");
-        $cache_item_with_certain_key_mock->getKey()->willReturn("foo");
+        $cache_item_with_certain_key_mock = (new Prophecy\Prophet())->prophesize(CacheItemInterface::class);
+        $cache_item_with_certain_key_mock->get()->willReturn('FooBar');
+        $cache_item_with_certain_key_mock->getKey()->willReturn('foo');
         $cache_item_with_certain_key = $cache_item_with_certain_key_mock->reveal();
 
-        return array(
-            'Empty cache w/o CacheItem'      => [ null, array() ],
-            'CacheItem mock'                 => [ $cache_item, array() ],
-            'CacheItem mock w/ certain key'  => [ $cache_item_with_certain_key, array() ],
-            'CacheItem mock and save'        => [ $cache_item, array('save'  => true) ],
-            'CacheItem mock and clear'       => [ $cache_item, array('clear' => true) ],
-            'CacheItem per array'            => [ array(
+        return [
+            'Empty cache w/o CacheItem' => [null, []],
+            'CacheItem mock' => [$cache_item, []],
+            'CacheItem mock w/ certain key' => [$cache_item_with_certain_key, []],
+            'CacheItem mock and save' => [$cache_item, ['save' => true]],
+            'CacheItem mock and clear' => [$cache_item, ['clear' => true]],
+            'CacheItem per array' => [[
                 'one' => $cache_item,
-                'two' => "ItemValue"
-            ), array('clear' => true) ]
-        );
+                'two' => 'ItemValue',
+            ], ['clear' => true]],
+        ];
     }
-
 }

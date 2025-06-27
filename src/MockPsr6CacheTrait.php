@@ -1,24 +1,33 @@
 <?php
 
+/**
+ * This file is part of tomkyle/mock-psr
+ *
+ * Traits for mocking common PSR components in PhpUnit tests
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace tomkyle\MockPsr;
 
-use Psr\Cache;
 use Prophecy;
+use Psr\Cache;
 
 trait MockPsr6CacheTrait
 {
     /**
      * @var string
      */
-    protected $default_key_name = "keyname";
+    protected $default_key_name = 'keyname';
 
     /**
-     * @param  CacheItemPoolInterface|array $cache_item
-     * @param  array  $options              CacheItemPool configuration
+     * @param array|CacheItemPoolInterface $cache_item
+     * @param array                        $options    CacheItemPool configuration
      */
     public function mockCacheItemPool($cache_item = null, array $options = [])
     {
-        $objectProphecy = (new Prophecy\Prophet)->prophesize(Cache\CacheItemPoolInterface::class);
+        $objectProphecy = (new Prophecy\Prophet())->prophesize(Cache\CacheItemPoolInterface::class);
 
         if ($cache_item instanceof Cache\CacheItemInterface) {
             $key = $cache_item->getKey();
@@ -30,7 +39,7 @@ trait MockPsr6CacheTrait
         } elseif (is_array($cache_item)) {
             foreach ($cache_item as $key => $item) {
                 if (!$item instanceof Cache\CacheItemInterface) {
-                    $item = $this->mockCacheItem($item, [ 'getKey' => $key ]);
+                    $item = $this->mockCacheItem($item, ['getKey' => $key]);
                 }
 
                 $key = $item->getKey();
@@ -38,7 +47,7 @@ trait MockPsr6CacheTrait
                 $objectProphecy->hasItem(Prophecy\Argument::exact($key))->willReturn(true);
             }
         } elseif ($cache_item) {
-            throw new \InvalidArgumentException("CacheItemInterface expected");
+            throw new \InvalidArgumentException('CacheItemInterface expected');
         }
 
         if ($options['save'] ?? false) {
@@ -53,16 +62,12 @@ trait MockPsr6CacheTrait
             $objectProphecy->hasItem(Prophecy\Argument::type('string'))->willReturn((bool) $options['hasItem']);
         }
 
-
         return $objectProphecy->reveal();
     }
 
-
-
-
     public function mockCacheItem($item_content, array $options = [])
     {
-        $objectProphecy = (new Prophecy\Prophet)->prophesize(Cache\CacheItemInterface::class);
+        $objectProphecy = (new Prophecy\Prophet())->prophesize(Cache\CacheItemInterface::class);
         $objectProphecy->get()->willReturn($item_content);
 
         // if ($get_value = $options['getKey'] ?? false):
@@ -89,12 +94,10 @@ trait MockPsr6CacheTrait
         return $objectProphecy->reveal();
     }
 
-
-
     public function mockMissingCacheItem($item_content, array $options = [])
     {
         return $this->mockCacheItem($item_content, array_merge($options, [
-            'isHit' => false
+            'isHit' => false,
         ]));
     }
 }

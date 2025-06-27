@@ -1,43 +1,51 @@
 <?php
+
+/**
+ * This file is part of tomkyle/mock-psr
+ *
+ * Traits for mocking common PSR components in PhpUnit tests
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace tomkyle\MockPsr;
 
 use Prophecy;
 
 trait MockPdoTrait
 {
-
-    protected function mockPdoStatement( bool $execute_result, array $fetch_result = [], array $error_info = []) : \PDOStatement
+    protected function mockPdoStatement(bool $execute_result, array $fetch_result = [], array $error_info = []): \PDOStatement
     {
-        $objectProphecy = (new Prophecy\Prophet)->prophesize(\PDOStatement::class);
+        $objectProphecy = (new Prophecy\Prophet())->prophesize(\PDOStatement::class);
 
-        $objectProphecy->setFetchMode( Prophecy\Argument::type('int'), Prophecy\Argument::any() )->willReturn( true );
+        $objectProphecy->setFetchMode(Prophecy\Argument::type('int'), Prophecy\Argument::any())->willReturn(true);
 
-        $objectProphecy->execute( Prophecy\Argument::any() )->willReturn( $execute_result );
+        $objectProphecy->execute(Prophecy\Argument::any())->willReturn($execute_result);
 
-        $objectProphecy->fetch()->willReturn( $execute_result ? $fetch_result : false );
+        $objectProphecy->fetch()->willReturn($execute_result ? $fetch_result : false);
         // $stmt->fetch(Prophecy\Argument::type('int'))->willReturn( $fetch_result );
         // $stmt->fetch(Prophecy\Argument::type('int'), Prophecy\Argument::type('int'))->willReturn( $fetch_result );
         // $stmt->fetch(Prophecy\Argument::type('int'), Prophecy\Argument::type('int'), Prophecy\Argument::type('int'))->willReturn( $fetch_result );
 
-        $objectProphecy->fetchAll( )->willReturn( $execute_result ? $fetch_result : [] );
+        $objectProphecy->fetchAll()->willReturn($execute_result ? $fetch_result : []);
         // $stmt->fetchAll( Prophecy\Argument::type('int') )->willReturn( $fetch_result );
         // $stmt->fetchAll( Prophecy\Argument::type('int'), Prophecy\Argument::any() )->willReturn( $fetch_result );
 
-        $objectProphecy->fetchObject()->willReturn( $execute_result ? (object) $fetch_result : false  );
+        $objectProphecy->fetchObject()->willReturn($execute_result ? (object) $fetch_result : false);
         // $stmt->fetchObject( Prophecy\Argument::type('string') )->willReturn( $fetch_result );
 
-        $objectProphecy->errorInfo()->willReturn($error_info );
+        $objectProphecy->errorInfo()->willReturn($error_info);
+
         return $objectProphecy->reveal();
     }
 
-
-    protected function mockPdo( ?\PDOStatement $pdoStatement = null) : \PDO
+    protected function mockPdo(?\PDOStatement $pdoStatement = null): \PDO
     {
         $pdoStatement = $pdoStatement ?: $this->mockPdoStatement(true);
-        $objectProphecy = (new Prophecy\Prophet)->prophesize(\PDO::class);
-        $objectProphecy->prepare( Prophecy\Argument::type('string') )->willReturn( $pdoStatement );
+        $objectProphecy = (new Prophecy\Prophet())->prophesize(\PDO::class);
+        $objectProphecy->prepare(Prophecy\Argument::type('string'))->willReturn($pdoStatement);
+
         return $objectProphecy->reveal();
     }
-
 }
-
