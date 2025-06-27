@@ -12,7 +12,7 @@ trait MockPsr18ClientTrait
 {
     use MockPsr7MessagesTrait;
 
-    public function mockClient(ResponseInterface $response = null): ClientInterface
+    public function mockClient(?ResponseInterface $response = null): ClientInterface
     {
         $response = $response ?: $this->mockResponse();
 
