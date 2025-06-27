@@ -1,50 +1,59 @@
 <?php
+
+/**
+ * This file is part of tomkyle/mock-psr
+ *
+ * Traits for mocking common PSR components in PhpUnit tests
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace tests;
 
-use tomkyle\MockPsr\MockPsr11ContainerTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use tomkyle\MockPsr\MockPsr11ContainerTrait;
 
-use Prophecy\Argument;
-
-class MockPsr11ContainerTraitTest extends \PHPUnit\Framework\TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+class MockPsr11ContainerTraitTest extends TestCase
 {
     // SUT
     use MockPsr11ContainerTrait;
 
-
     #[DataProvider('provideContainerContentArray')]
-    public function testMockContainer( $items )
+    public function testMockContainer($items)
     {
         $container = $this->mockContainer($items);
-        $this->assertInstanceOf( ContainerInterface::class, $container);
+        $this->assertInstanceOf(ContainerInterface::class, $container);
 
-        foreach($items as $key => $value) {
-            $this->assertTrue( $container->has($key ));
-            $this->assertEquals( $value, $container->get($key));
+        foreach ($items as $key => $value) {
+            $this->assertTrue($container->has($key));
+            $this->assertEquals($value, $container->get($key));
         }
     }
 
-
     public static function provideContainerContentArray()
     {
-        return array(
-            'Empty container' => [ array() ],
-            'foo => bar' => [ array('foo' => 'bar', 'qux' => 'baz') ],
-        );
+        return [
+            'Empty container' => [[]],
+            'foo => bar' => [['foo' => 'bar', 'qux' => 'baz']],
+        ];
     }
 
-
-    public function testNotFoundException( )
+    public function testNotFoundException()
     {
-        $container = $this->mockContainer( array() );
-        $this->assertInstanceOf( ContainerInterface::class, $container);
+        $container = $this->mockContainer([]);
+        $this->assertInstanceOf(ContainerInterface::class, $container);
 
-        $this->assertFalse( $container->has("foo"));
+        $this->assertFalse($container->has('foo'));
         $this->expectException(NotFoundExceptionInterface::class);
-        $container->get("foo");
+        $container->get('foo');
     }
-
-
 }

@@ -1,37 +1,51 @@
 <?php
+
+/**
+ * This file is part of tomkyle/mock-psr
+ *
+ * Traits for mocking common PSR components in PhpUnit tests
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace tests;
 
-use tomkyle\MockPsr\MockPsr18ClientTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use Prophecy;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
-use Prophecy;
-use Prophecy\Argument;
+use tomkyle\MockPsr\MockPsr18ClientTrait;
 
-class MockPsr18ClientTraitTest extends \PHPUnit\Framework\TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+class MockPsr18ClientTraitTest extends TestCase
 {
     // SUT
     use MockPsr18ClientTrait;
 
-
     #[DataProvider('provideVariousResponses')]
-    public function testMockClient( $response )
+    public function testMockClient($response)
     {
         $handler = $this->mockClient($response);
-        $this->assertInstanceOf( ClientInterface::class, $handler);
+        $this->assertInstanceOf(ClientInterface::class, $handler);
     }
 
     public static function provideVariousResponses()
     {
-        $response200 = (new Prophecy\Prophet)->prophesize(ResponseInterface::class);
+        $response200 = (new Prophecy\Prophet())->prophesize(ResponseInterface::class);
         $response200->getStatusCode()->willReturn(200);
-        $response400 = (new Prophecy\Prophet)->prophesize(ResponseInterface::class);
+        $response400 = (new Prophecy\Prophet())->prophesize(ResponseInterface::class);
         $response400->getStatusCode()->willReturn(400);
 
-        return array(
-            'Response with 200' => [ $response200->reveal() ],
-            'Response with 400' => [ $response400->reveal() ],
-            'No response defined' => [ null ]
-        );
+        return [
+            'Response with 200' => [$response200->reveal()],
+            'Response with 400' => [$response400->reveal()],
+            'No response defined' => [null],
+        ];
     }
 }
