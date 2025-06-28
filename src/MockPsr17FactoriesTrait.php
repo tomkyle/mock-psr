@@ -3,7 +3,7 @@
 /**
  * This file is part of tomkyle/mock-psr
  *
- * Traits for mocking common PSR components in PhpUnit tests
+ * Mock common PSR standard components in PhpUnit tests
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
