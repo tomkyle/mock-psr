@@ -1,6 +1,6 @@
 <h1 align="center">tomkyle · Mock PSR</h1>
 
-**Mock common PSR components in PhpUnit Tests.**
+**Effortless PHPUnit mocks for common PSR interfaces – no more boilerplate, just clean tests.**
 [![PHP Composer](https://github.com/tomkyle/mock-psr/actions/workflows/php.yml/badge.svg)](https://github.com/tomkyle/mock-psr/actions/workflows/php.yml)
 
 ---
@@ -15,16 +15,56 @@ $ composer require --dev tomkyle/mock-psr
 
 ## Usage
 
+This library provides two ways to use the PSR mocking functionality:
+
+### Option 1: Individual Traits
+
+Each PSR standard has its own trait that can be used independently in your test classes:
+
 ```php
 <?php
-use tomkyle\MockPsr\MockPsr11ContainerTrait;
 use tomkyle\MockPsr\MockPsr6CacheTrait;
 use tomkyle\MockPsr\MockPsr7MessagesTrait;
+use tomkyle\MockPsr\MockPsr11ContainerTrait;
 use tomkyle\MockPsr\MockPsr15RequestHandlerTrait;
+use tomkyle\MockPsr\MockPsr17FactoriesTrait;
 use tomkyle\MockPsr\MockPsr18ClientTrait;  
 
 # Bonus
 use tomkyle\MockPsr\MockPdoTrait;
+
+class YourTest extends \PHPUnit\Framework\TestCase
+{
+    use MockPsr7MessagesTrait;
+    use MockPsr11ContainerTrait;
+    
+    public function testSomething()
+    {
+        $response = $this->mockResponse(200, 'OK');
+        $container = $this->mockContainer(['service' => 'value']);
+    }
+}
+```
+
+### Option 2: PsrMockFactory (Recommended)
+
+For convenience, use the `PsrMockFactory` class which includes all traits and provides access to all mocking methods:
+
+```php
+<?php
+use tomkyle\MockPsr\PsrMockFactory;
+
+class YourTest extends \PHPUnit\Framework\TestCase
+{
+    public function testSomething()
+    {
+        $factory = new PsrMockFactory('test');
+        
+        $response = $factory->mockResponse(200, 'OK');
+        $container = $factory->mockContainer(['service' => 'value']);
+        $client = $factory->mockClient($response);
+    }
+}
 ```
 
 ## Examples
@@ -33,33 +73,33 @@ use tomkyle\MockPsr\MockPdoTrait;
 
 ```php
 <?php
-use tomkyle\MockPsr\MockPsr7MessagesTrait;
+use tomkyle\MockPsr\PsrMockFactory;
 
 class SomeUnitTest extends \PHPUnit\Framework\TestCase
 {
-	use MockPsr7MessagesTrait;
-
 	public function testSomething() 
 	{
+		$factory = new PsrMockFactory('test');
+
 		// Psr\Http\Message\ServerRequestInterface
-		$server_request = $this->mockServerRequest();
+		$server_request = $factory->mockServerRequest();
 		$attributes = array();
 		$headers = array();
-		$server_request = $this->mockServerRequest($attributes, $headers);
+		$server_request = $factory->mockServerRequest($attributes, $headers);
 
 		// Psr\Http\Message\UriInterface
-		$uri = $this->mockUri("https://test.com");
+		$uri = $factory->mockUri("https://test.com");
 
 		// Psr\Http\Message\RequestInterface
-		$request = $this->mockRequest("GET", $uri);
-		$request = $this->mockRequest("GET", "/home");
+		$request = $factory->mockRequest("GET", $uri);
+		$request = $factory->mockRequest("GET", "/home");
 
 		// Psr\Http\Message\StreamInterface
-		$stream = $this->mockStream("body string");
+		$stream = $factory->mockStream("body string");
 
 		// Psr\Http\Message\ResponseInterface
-		$response = $this->mockResponse(200, $stream);
-		$response = $this->mockResponse(404, "body string");
+		$response = $factory->mockResponse(200, $stream);
+		$response = $factory->mockResponse(404, "body string");
 	}
 }
 ```
@@ -70,17 +110,17 @@ Pass an optional array with things the Container has; calling *has* and *get* me
 
 ```php
 <?php
-use tomkyle\MockPsr\MockPsr11ContainerTrait;
+use tomkyle\MockPsr\PsrMockFactory;
 
 class SomeUnitTest extends \PHPUnit\Framework\TestCase
 {
-	use MockPsr11ContainerTrait;
-
 	public function testSomething() 
 	{
+		$factory = new PsrMockFactory('test');
+
 		// Psr\Container\ContainerInterface
-		$container = $this->mockContainer();
-		$container = $this->mockContainer([
+		$container = $factory->mockContainer();
+		$container = $factory->mockContainer([
 			'foo' => 'bar',
 			'qux' => 'baz'        
 		]);
@@ -92,25 +132,53 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 }
 ```
 
+### PSR-6 Cache
+
+```php
+<?php
+use tomkyle\MockPsr\PsrMockFactory;
+
+class SomeUnitTest extends \PHPUnit\Framework\TestCase
+{
+	public function testSomething() 
+	{
+		$factory = new PsrMockFactory('test');
+
+		// Psr\Cache\CacheItemInterface
+		$cache_item = $factory->mockCacheItem('cached value');
+		$cache_item = $factory->mockCacheItem('value', ['isHit' => true]);
+		$missing_item = $factory->mockMissingCacheItem('missing-key');
+
+		// Psr\Cache\CacheItemPoolInterface
+		$cache_pool = $factory->mockCacheItemPool();
+		$cache_pool = $factory->mockCacheItemPool($cache_item);
+		$cache_pool = $factory->mockCacheItemPool([
+			'key1' => 'value1',
+			'key2' => $cache_item
+		]);
+	}
+}
+```
+
 ### PSR-15 RequestHandler
 
 Includes *MockPsr7MessagesTrait*
 
 ```php
 <?php
-use tomkyle\MockPsr\MockPsr15RequestHandlerTrait;
+use tomkyle\MockPsr\PsrMockFactory;
 
 class SomeUnitTest extends \PHPUnit\Framework\TestCase
 {
-	use MockPsr15RequestHandlerTrait;
-
 	public function testSomething() 
 	{
-		// Psr\Http\Server\RequestHandlerInterface
-		$request_handler = $this->mockRequestHandler();
+		$factory = new PsrMockFactory('test');
 
-		$response = $this->mockResponse(404, "body string");
-		$request_handler = $this->mockRequestHandler( $response );
+		// Psr\Http\Server\RequestHandlerInterface
+		$request_handler = $factory->mockRequestHandler();
+
+		$response = $factory->mockResponse(404, "body string");
+		$request_handler = $factory->mockRequestHandler( $response );
 	}
 }
 ```
@@ -121,26 +189,26 @@ Includes *MockPsr7MessagesTrait*
 
 ```php
 <?php
-use tomkyle\MockPsr\MockPsr17FactoriesTrait;
+use tomkyle\MockPsr\PsrMockFactory;
 
 class SomeUnitTest extends \PHPUnit\Framework\TestCase
 {
-	use MockPsr17FactoriesTrait;
-
 	public function testSomething() 
 	{
-		// Psr\Http\Message\RequestFactoryInterface
-		$request_factory = $this->mockRequestFactory();
+		$factory = new PsrMockFactory('test');
 
-		$request = $this->mockRequest();
-		$request_factory = $this->mockRequestFactory( $request );
+		// Psr\Http\Message\RequestFactoryInterface
+		$request_factory = $factory->mockRequestFactory();
+
+		$request = $factory->mockRequest();
+		$request_factory = $factory->mockRequestFactory( $request );
 
 
 		// Psr\Http\Message\ResponseFactoryInterface
-		$response_factory = $this->mockResponseFactory();
+		$response_factory = $factory->mockResponseFactory();
 
-		$response = $this->mockResponse(404, "body string");
-		$response_factory = $this->mockResponseFactory( $response );
+		$response = $factory->mockResponse(404, "body string");
+		$response_factory = $factory->mockResponseFactory( $response );
 	}
 }
 ```
@@ -151,19 +219,19 @@ Includes *MockPsr7MessagesTrait*
 
 ```php
 <?php
-use tomkyle\MockPsr\MockPsr18ClientTrait;
+use tomkyle\MockPsr\PsrMockFactory;
 
 class SomeUnitTest extends \PHPUnit\Framework\TestCase
 {
-	use MockPsr18ClientTrait;
-
 	public function testSomething() 
 	{
-		// Psr\Http\Client\ClientInterface
-		$client = $this->mockClient();
+		$factory = new PsrMockFactory('test');
 
-		$response = $this->mockResponse(404, "body string");
-		$client = $this->mockClient( $response );
+		// Psr\Http\Client\ClientInterface
+		$client = $factory->mockClient();
+
+		$response = $factory->mockResponse(404, "body string");
+		$client = $factory->mockClient( $response );
 	}
 }
 ```
@@ -172,25 +240,25 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 
 ```php
 <?php
-use tomkyle\MockPsr\MockPdoTrait;
+use tomkyle\MockPsr\PsrMockFactory;
 
 class SomeUnitTest extends \PHPUnit\Framework\TestCase
 {
-	use MockPdoTrait;
-
 	public function testSomething() 
 	{
+		$factory = new PsrMockFactory('test');
+
 		// \PDOStatement
 		$execution_result = true;
-    $stmt = $this->mockPdoStatement($execution_result);
-    $stmt = $this->mockPdoStatement(true, array("foo" => "bar"));    
+		$stmt = $factory->mockPdoStatement($execution_result);
+		$stmt = $factory->mockPdoStatement(true, array("foo" => "bar"));    
 
-    // \PDO
-    $pdo = $this->mockPdo();
-    $pdo = $this->mockPdo($stmt);   
-    
-    $stmt_2 = $pdo->prepare("SELECT");
-    $stmt_2 == $stmt
+		// \PDO
+		$pdo = $factory->mockPdo();
+		$pdo = $factory->mockPdo(array("attribute" => \PDO::ATTR_ERRMODE));   
+		
+		$stmt_2 = $pdo->prepare("SELECT");
+		// $stmt_2 will be a PDOStatement mock
 	}
 }
 ```
@@ -199,61 +267,17 @@ class SomeUnitTest extends \PHPUnit\Framework\TestCase
 
 ## Development
 
-### Run all tests
-
-This packages has predefined test setups for code quality, code readability and unit tests. Check them out at the `scripts` section of **[composer.json](./composer.json)**.
+After cloning the repo, install dev dependencies like so:
 
 ```bash
-$ composer test
-# ... which includes
-$ composer phpstan
-$ composer phpcs
-$ composer phpunit
+$ composer install
+$ npm install
 ```
 
-### Unit tests
-
-Default configuration is **[phpunit.xml.dist](./phpunit.xml.dist).** Create a custom **phpunit.xml** to apply your own settings. 
-Also visit [phpunit.readthedocs.io](https://phpunit.readthedocs.io/) · [Packagist](https://packagist.org/packages/phpunit/phpunit)
+This package has predefined test setups for code quality, code readability and unit tests. Check them out at the `scripts` section of **[package.json](./package.json)**. When working on this library, you basically only need:
 
 ```bash
-$ composer phpunit
-# ... or
-$ vendor/bin/phpunit
-```
-
-### PhpStan
-
-Default configuration is **[phpstan.neon.dist](./phpstan.neon.dist).** Create a custom **phpstan.neon** to apply your own settings. Also visit [phpstan.org](https://phpstan.org/) · [GitHub](https://github.com/phpstan/phpstan) · [Packagist](https://packagist.org/packages/phpstan/phpstan)
-
-```bash
-$ composer phpstan
-# ... which includes
-$ vendor/bin/phpstan analyse
-```
-
-### PhpCS
-
-Default configuration is **[.php-cs-fixer.dist.php](./.php-cs-fixer.dist.php).** Create a custom **.php-cs-fixer.php** to apply your own settings. Also visit [cs.symfony.com](https://cs.symfony.com/) ·  [GitHub](https://github.com/FriendsOfPHP/PHP-CS-Fixer) · [Packagist](https://packagist.org/packages/friendsofphp/php-cs-fixer)
-
-```bash
-$ composer phpcs
-# ... which aliases
-$ vendor/bin/php-cs-fixer fix --verbose --diff --dry-run
-```
-
-Apply all CS fixes:
-
-```bash
-$ composer phpcs:apply
-# ... which aliases 
-$ vendor/bin/php-cs-fixer fix --verbose --diff
-```
-
-**On PHP 8.2, setting environment variable `PHP_CS_FIXER_IGNORE_ENV` is needed:**
-
-```bash
-$ PHP_CS_FIXER_IGNORE_ENV=1 composer phpcs
+$ npm run watch
 ```
 
 

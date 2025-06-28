@@ -1,6 +1,26 @@
 {
 	"name": "tomkyle/mock-psr",
 	"description": "Traits for mocking common PSR components in PhpUnit tests",
+	"keywords": [
+    "phpunit",
+    "mock",
+		"psr-6",
+		"psr-7",
+		"psr-11",
+		"psr-15",
+		"psr-17",
+		"psr-18",
+    "test-doubles",
+		"cache",
+		"http",
+		"container",
+		"dependency-injection",
+		"middleware",
+		"http-client",
+		"http-factory",
+		"testing",
+		"mocking"
+	],
 
 	"authors": [{
 		"name": "Carsten Witt",
@@ -32,34 +52,16 @@
 		"psr/http-message": "^1.0|^2.0",
 		"psr/http-server-handler": "^1.0",
 		"nyholm/psr7": "^1.4",
-		"phpunit/phpunit": "^11.0|^12.0",
-		"phpspec/prophecy": "^1.15"
+		"phpunit/phpunit": "^12.0"
 	},
 
 	"require-dev": {
 		"guzzlehttp/guzzle": "^7.0",
 		"symfony/cache": "^5.0|^6.0|^7.0",
-		"friendsofphp/php-cs-fixer": "^3.0",
+		"friendsofphp/php-cs-fixer": "^3.65",
 		"phpstan/phpstan": "^2.1",
-		"rector/rector": "^2.1"
-	},
-
-	"scripts": {
-		"phpstan"     : "phpstan analyse",
-		"watch"       : "phpunit-watcher watch --testsuite unit --testdox",
-
-		"phpcs": [
-			"@phpcs:dry"
-		],
-		"phpcs:dry"   : "php-cs-fixer fix --verbose --diff --dry-run",
-		"phpcs:apply" : "php-cs-fixer fix --verbose --diff",
-
-		"phpunit"     : "phpunit --testdox",
-
-		"test": [
-			"@phpcs",
-			"@phpstan",
-			"@phpunit"
-		]
+		"rector/rector": "^2.1",
+    "tomkyle/find-run-test": "^1.0"
 	}
+
 }

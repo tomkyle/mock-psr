@@ -13,24 +13,19 @@ namespace tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Prophecy;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use tomkyle\MockPsr\MockPsr6CacheTrait;
 
-/**
- * @internal
- *
- * @coversNothing
- */
+
 class MockPsr6CacheTraitTest extends TestCase
 {
-    // SUT
-    use MockPsr6CacheTrait;
-
     public function testMockMissingCacheItem()
     {
-        $cache_item = $this->mockMissingCacheItem('missing');
+        $sut = new class('test') extends TestCase {
+            use MockPsr6CacheTrait;
+        };
+        $cache_item = $sut->mockMissingCacheItem('missing');
 
         $this->assertInstanceOf(CacheItemInterface::class, $cache_item);
         $this->assertFalse($cache_item->isHit());
@@ -39,7 +34,10 @@ class MockPsr6CacheTraitTest extends TestCase
     #[DataProvider('provideVariousCacheItemContent')]
     public function testMockCacheItem($key, $content, $options)
     {
-        $cache_item = $this->mockCacheItem($content, $options);
+        $sut = new class('test') extends TestCase {
+            use MockPsr6CacheTrait;
+        };
+        $cache_item = $sut->mockCacheItem($content, $options);
 
         $this->assertInstanceOf(CacheItemInterface::class, $cache_item);
         $this->assertEquals($content, $cache_item->get());
@@ -79,7 +77,10 @@ class MockPsr6CacheTraitTest extends TestCase
     #[DataProvider('provideVariousCacheItems')]
     public function testMockCacheItemPool($cache_item, $options)
     {
-        $cache = $this->mockCacheItemPool($cache_item, $options);
+        $sut = new class('test') extends TestCase {
+            use MockPsr6CacheTrait;
+        };
+        $cache = $sut->mockCacheItemPool($cache_item, $options);
         $this->assertInstanceOf(CacheItemPoolInterface::class, $cache);
 
         if ($options['save'] ?? false) {
@@ -97,15 +98,19 @@ class MockPsr6CacheTraitTest extends TestCase
 
     public static function provideVariousCacheItems()
     {
-        $cache_item_mock = (new Prophecy\Prophet())->prophesize(CacheItemInterface::class);
-        $cache_item_mock->get()->willReturn('QuxBaz');
-        $cache_item_mock->getKey()->willReturn('qux');
-        $cache_item = $cache_item_mock->reveal();
+        $factory = new class('factory') extends TestCase {
+            use MockPsr6CacheTrait;
+        };
 
-        $cache_item_with_certain_key_mock = (new Prophecy\Prophet())->prophesize(CacheItemInterface::class);
-        $cache_item_with_certain_key_mock->get()->willReturn('FooBar');
-        $cache_item_with_certain_key_mock->getKey()->willReturn('foo');
-        $cache_item_with_certain_key = $cache_item_with_certain_key_mock->reveal();
+        $cache_item_mock = $factory->createMock(CacheItemInterface::class);
+        $cache_item_mock->method('get')->willReturn('QuxBaz');
+        $cache_item_mock->method('getKey')->willReturn('qux');
+        $cache_item = $cache_item_mock;
+
+        $cache_item_with_certain_key_mock = $factory->createMock(CacheItemInterface::class);
+        $cache_item_with_certain_key_mock->method('get')->willReturn('FooBar');
+        $cache_item_with_certain_key_mock->method('getKey')->willReturn('foo');
+        $cache_item_with_certain_key = $cache_item_with_certain_key_mock;
 
         return [
             'Empty cache w/o CacheItem' => [null, []],

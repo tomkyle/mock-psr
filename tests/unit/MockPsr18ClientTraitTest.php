@@ -13,38 +13,35 @@ namespace tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Prophecy;
 use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\ResponseInterface;
 use tomkyle\MockPsr\MockPsr18ClientTrait;
+use tomkyle\MockPsr\MockPsr7MessagesTrait;
 
-/**
- * @internal
- *
- * @coversNothing
- */
+
 class MockPsr18ClientTraitTest extends TestCase
 {
-    // SUT
-    use MockPsr18ClientTrait;
-
     #[DataProvider('provideVariousResponses')]
-    public function testMockClient($response)
+    public function testMockFactory($response)
     {
-        $handler = $this->mockClient($response);
+        $sut = new class('test') extends TestCase {
+            use MockPsr18ClientTrait;
+        };
+        $handler = $sut->mockClient($response);
         $this->assertInstanceOf(ClientInterface::class, $handler);
     }
 
     public static function provideVariousResponses()
     {
-        $response200 = (new Prophecy\Prophet())->prophesize(ResponseInterface::class);
-        $response200->getStatusCode()->willReturn(200);
-        $response400 = (new Prophecy\Prophet())->prophesize(ResponseInterface::class);
-        $response400->getStatusCode()->willReturn(400);
+        $factory = new class('factory') extends TestCase {
+            use MockPsr7MessagesTrait;
+        };
+
+        $response200 = $factory->mockResponse(200);
+        $response400 = $factory->mockResponse(400);
 
         return [
-            'Response with 200' => [$response200->reveal()],
-            'Response with 400' => [$response400->reveal()],
+            'Response with 200' => [$response200],
+            'Response with 400' => [$response400],
             'No response defined' => [null],
         ];
     }

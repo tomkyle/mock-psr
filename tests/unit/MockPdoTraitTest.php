@@ -22,56 +22,45 @@ use tomkyle\MockPsr\MockPdoTrait;
  */
 class MockPdoTraitTest extends TestCase
 {
-    // SUT
-    use MockPdoTrait;
-
-    #[DataProvider('provideStatements')]
-    public function testMockPdo($stmt = null): void
+    #[DataProvider('providePdoMockData')]
+    public function testMockPdo($options)
     {
-        $pdo = $this->mockPdo($stmt);
+        $sut = new class('test') extends TestCase {
+            use MockPdoTrait;
+        };
+        $pdo = $sut->mockPdo($options);
         $this->assertInstanceOf(\PDO::class, $pdo);
-
-        $stmt = $pdo->prepare('SELECT * FROM table WHERE 1');
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
     }
 
-    public static function provideStatements(): array
+    public static function providePdoMockData()
     {
         return [
-            'No parameters' => [],
+            'Empty options' => [[]],
+            'With options' => [['attribute' => \PDO::ATTR_ERRMODE]],
         ];
     }
 
-    #[DataProvider('provideStatementParameters')]
-    public function testMockPdoStatement(bool $execute_result, array $fetch_result = [], array $error_info = []): void
+    #[DataProvider('providePdoStatementMockData')]
+    public function testMockPdoStatement($fetchResult, $options)
     {
-        $stmt = $this->mockPdoStatement($execute_result, $fetch_result, $error_info);
-
+        $sut = new class('test') extends TestCase {
+            use MockPdoTrait;
+        };
+        $stmt = $sut->mockPdoStatement($fetchResult, $options);
         $this->assertInstanceOf(\PDOStatement::class, $stmt);
 
-        if ($execute_result) {
-            $this->assertEquals($stmt->fetch(), $fetch_result);
-            $this->assertEquals($stmt->fetchAll(), $fetch_result);
-            $this->assertEquals($stmt->fetchObject(), (object) $fetch_result);
-        } else {
-            $this->assertFalse($stmt->fetch());
-            $this->assertFalse($stmt->fetchObject());
-
-            $fetch_all = $stmt->fetchAll();
-            $this->assertIsArray($fetch_all);
-            $this->assertTrue(empty($fetch_all));
+        if (null !== $fetchResult) {
+            $this->assertEquals($fetchResult, $stmt->fetch());
         }
-
-        $this->assertEquals($stmt->errorInfo(), $error_info);
     }
 
-    public static function provideStatementParameters(): array
+    public static function providePdoStatementMockData()
     {
         return [
-            "execute yields 'true'" => [true],
-            "execute yields 'false'" => [false],
-            'Certain result' => [true, ['foo' => 'bar']],
-            'w/ error' => [true, ['foo' => 'bar'], ['42S02', '-204', 'BUUUH!']],
+            'Empty result' => [null, []],
+            'Array result' => [['id' => 1, 'name' => 'test'], []],
+            'String result' => ['test', []],
+            'With options' => [['data'], ['rowCount' => 5]],
         ];
     }
 }

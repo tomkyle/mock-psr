@@ -11,41 +11,86 @@
 
 namespace tomkyle\MockPsr;
 
-use Prophecy;
+use PHPUnit\Framework\MockObject\MockObject;
 
 trait MockPdoTrait
 {
-    protected function mockPdoStatement(bool $execute_result, array $fetch_result = [], array $error_info = []): \PDOStatement
+    /**
+     * Create a mock PDO instance.
+     *
+     * Returns a mock PDO object configured to return mock statements and controlled attributes.
+     *
+     * Usage:
+     *
+     * <code>
+     * $pdo = $this->mockPdo(['attribute' => PDO::ATTR_ERRMODE]);
+     * $stmt = $pdo->prepare('SELECT * FROM table');
+     * </code>
+     *
+     * @param array $options options for configuring PDO: 'attribute' => mixed
+     *
+     * @return \PDO a mock PDO instance
+     */
+    public function mockPdo(array $options = []): \PDO
     {
-        $objectProphecy = (new Prophecy\Prophet())->prophesize(\PDOStatement::class);
+        /** @var MockObject&\PDO $pdo */
+        $pdo = $this->createMock(\PDO::class);
 
-        $objectProphecy->setFetchMode(Prophecy\Argument::type('int'), Prophecy\Argument::any())->willReturn(true);
+        $pdo->method('getAttribute')->willReturnCallback(fn () => $options['attribute'] ?? null);
 
-        $objectProphecy->execute(Prophecy\Argument::any())->willReturn($execute_result);
+        $pdo->method('setAttribute')->willReturn(true);
+        $pdo->method('prepare')->willReturnCallback(fn () => $this->mockPdoStatement());
 
-        $objectProphecy->fetch()->willReturn($execute_result ? $fetch_result : false);
-        // $stmt->fetch(Prophecy\Argument::type('int'))->willReturn( $fetch_result );
-        // $stmt->fetch(Prophecy\Argument::type('int'), Prophecy\Argument::type('int'))->willReturn( $fetch_result );
-        // $stmt->fetch(Prophecy\Argument::type('int'), Prophecy\Argument::type('int'), Prophecy\Argument::type('int'))->willReturn( $fetch_result );
+        $pdo->method('query')->willReturnCallback(fn () => $this->mockPdoStatement());
 
-        $objectProphecy->fetchAll()->willReturn($execute_result ? $fetch_result : []);
-        // $stmt->fetchAll( Prophecy\Argument::type('int') )->willReturn( $fetch_result );
-        // $stmt->fetchAll( Prophecy\Argument::type('int'), Prophecy\Argument::any() )->willReturn( $fetch_result );
+        $pdo->method('exec')->willReturn(1);
+        $pdo->method('lastInsertId')->willReturn('1');
+        $pdo->method('beginTransaction')->willReturn(true);
+        $pdo->method('commit')->willReturn(true);
+        $pdo->method('rollBack')->willReturn(true);
+        $pdo->method('inTransaction')->willReturn(false);
 
-        $objectProphecy->fetchObject()->willReturn($execute_result ? (object) $fetch_result : false);
-        // $stmt->fetchObject( Prophecy\Argument::type('string') )->willReturn( $fetch_result );
-
-        $objectProphecy->errorInfo()->willReturn($error_info);
-
-        return $objectProphecy->reveal();
+        return $pdo;
     }
 
-    protected function mockPdo(?\PDOStatement $pdoStatement = null): \PDO
+    /**
+     * Create a mock PDOStatement.
+     *
+     * Returns a mock PDOStatement configured to return provided fetch results and options.
+     *
+     * Usage:
+     *
+     * <code>
+     * $stmt = $this->mockPdoStatement(['id' => 1], ['rowCount' => 1]);
+     * $stmt->fetch(); // ['id' => 1]
+     * $stmt->rowCount(); // 1
+     * </code>
+     *
+     * @param mixed $fetchResult value to be returned by fetch() and fetchColumn()
+     * @param array $options     options for configuring statement: 'rowCount' and 'columnCount'
+     *
+     * @return \PDOStatement a mock PDOStatement instance
+     */
+    public function mockPdoStatement($fetchResult = null, array $options = []): \PDOStatement
     {
-        $pdoStatement = $pdoStatement ?: $this->mockPdoStatement(true);
-        $objectProphecy = (new Prophecy\Prophet())->prophesize(\PDO::class);
-        $objectProphecy->prepare(Prophecy\Argument::type('string'))->willReturn($pdoStatement);
+        /** @var MockObject&\PDOStatement $stmt */
+        $stmt = $this->createMock(\PDOStatement::class);
 
-        return $objectProphecy->reveal();
+        $stmt->method('execute')->willReturn(true);
+        $stmt->method('fetch')->willReturn($fetchResult);
+        $stmt->method('fetchAll')->willReturn(is_array($fetchResult) ? [$fetchResult] : []);
+        $stmt->method('fetchColumn')->willReturn(is_array($fetchResult) ? reset($fetchResult) : $fetchResult);
+        $stmt->method('rowCount')->willReturn($options['rowCount'] ?? 1);
+        $stmt->method('columnCount')->willReturn($options['columnCount'] ?? 1);
+
+        $stmt->method('bindParam')->willReturn(true);
+        $stmt->method('bindValue')->willReturn(true);
+        $stmt->method('bindColumn')->willReturn(true);
+
+        $stmt->method('closeCursor')->willReturn(true);
+        $stmt->method('errorCode')->willReturn('00000');
+        $stmt->method('errorInfo')->willReturn(['00000', null, null]);
+
+        return $stmt;
     }
 }

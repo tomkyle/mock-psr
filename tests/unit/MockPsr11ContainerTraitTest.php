@@ -17,20 +17,16 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use tomkyle\MockPsr\MockPsr11ContainerTrait;
 
-/**
- * @internal
- *
- * @coversNothing
- */
+
 class MockPsr11ContainerTraitTest extends TestCase
 {
-    // SUT
-    use MockPsr11ContainerTrait;
-
     #[DataProvider('provideContainerContentArray')]
     public function testMockContainer($items)
     {
-        $container = $this->mockContainer($items);
+        $sut = new class('test') extends TestCase {
+            use MockPsr11ContainerTrait;
+        };
+        $container = $sut->mockContainer($items);
         $this->assertInstanceOf(ContainerInterface::class, $container);
 
         foreach ($items as $key => $value) {
@@ -49,7 +45,10 @@ class MockPsr11ContainerTraitTest extends TestCase
 
     public function testNotFoundException()
     {
-        $container = $this->mockContainer([]);
+        $sut = new class('test') extends TestCase {
+            use MockPsr11ContainerTrait;
+        };
+        $container = $sut->mockContainer([]);
         $this->assertInstanceOf(ContainerInterface::class, $container);
 
         $this->assertFalse($container->has('foo'));

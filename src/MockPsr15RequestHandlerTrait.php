@@ -11,26 +11,45 @@
 
 namespace tomkyle\MockPsr;
 
-use Prophecy;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 trait MockPsr15RequestHandlerTrait
 {
     use MockPsr7MessagesTrait;
 
+    /**
+     * Create a mock PSR-15 RequestHandler.
+     *
+     * Returns a mock implementation of RequestHandlerInterface that returns the
+     * given ResponseInterface or throws the given exception when handling a request.
+     *
+     * Usage:
+     *
+     * <code>
+     * $response = $this->mockResponse(404, 'Not Found');
+     * $handler = $this->mockRequestHandler($response);
+     * $handler->handle($request);
+     * </code>
+     *
+     * @param null|ResponseInterface|\Throwable $response response to return or exception to throw
+     *
+     * @return RequestHandlerInterface a PSR-15 request handler mock
+     */
     public function mockRequestHandler($response = null): RequestHandlerInterface
     {
         $response = $response ?: $this->mockResponse();
-        $objectProphecy = (new Prophecy\Prophet())->prophesize(RequestHandlerInterface::class);
+
+        /** @var MockObject&RequestHandlerInterface $handler */
+        $handler = $this->createMock(RequestHandlerInterface::class);
 
         if ($response instanceof ResponseInterface) {
-            $objectProphecy->handle(Prophecy\Argument::type(ServerRequestInterface::class))->willReturn($response);
+            $handler->method('handle')->willReturn($response);
         } elseif ($response instanceof \Throwable) {
-            $objectProphecy->handle(Prophecy\Argument::type(ServerRequestInterface::class))->willThrow($response);
+            $handler->method('handle')->willThrowException($response);
         }
 
-        return $objectProphecy->reveal();
+        return $handler;
     }
 }
