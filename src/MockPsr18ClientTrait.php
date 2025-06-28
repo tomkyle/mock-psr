@@ -11,22 +11,40 @@
 
 namespace tomkyle\MockPsr;
 
-use Prophecy;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 trait MockPsr18ClientTrait
 {
     use MockPsr7MessagesTrait;
 
+    /**
+     * Create a mock PSR-18 HTTP client.
+     *
+     * Returns a mock implementation of ClientInterface that returns the
+     * given ResponseInterface when sendRequest() is called.
+     *
+     * Usage:
+     *
+     * <code>
+     * $response = $this->mockResponse(200, 'body');
+     * $client = $this->mockClient($response);
+     * $client->sendRequest($request);
+     * </code>
+     *
+     * @param null|ResponseInterface $response response to return
+     *
+     * @return ClientInterface a PSR-18 HTTP client mock
+     */
     public function mockClient(?ResponseInterface $response = null): ClientInterface
     {
         $response = $response ?: $this->mockResponse();
 
-        $objectProphecy = (new Prophecy\Prophet())->prophesize(ClientInterface::class);
-        $objectProphecy->sendRequest(Prophecy\Argument::type(RequestInterface::class))->willReturn($response);
+        /** @var ClientInterface&MockObject $client */
+        $client = $this->createMock(ClientInterface::class);
+        $client->method('sendRequest')->willReturn($response);
 
-        return $objectProphecy->reveal();
+        return $client;
     }
 }

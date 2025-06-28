@@ -13,7 +13,6 @@ namespace tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Prophecy;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -21,20 +20,16 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use tomkyle\MockPsr\MockPsr7MessagesTrait;
 
-/**
- * @internal
- *
- * @coversNothing
- */
+
 class MockPsr7MessagesTraitTest extends TestCase
 {
-    // SUT
-    use MockPsr7MessagesTrait;
-
     #[DataProvider('provideMethodsAndUris')]
     public function testMockRequest($method, $uri)
     {
-        $request = $this->mockRequest($method, $uri);
+        $sut = new class('test') extends TestCase {
+            use MockPsr7MessagesTrait;
+        };
+        $request = $sut->mockRequest($method, $uri);
 
         $this->assertInstanceOf(RequestInterface::class, $request);
         $this->assertEquals($method, $request->getMethod());
@@ -53,17 +48,23 @@ class MockPsr7MessagesTraitTest extends TestCase
 
     public function testMockStream()
     {
-        $stream = $this->mockStream('String');
+        $sut = new class('test') extends TestCase {
+            use MockPsr7MessagesTrait;
+        };
+        $stream = $sut->mockStream('String');
         $this->assertInstanceOf(StreamInterface::class, $stream);
 
-        $stream = $this->mockStream('String', ['write' => true]);
+        $stream = $sut->mockStream('String', ['write' => true]);
         $stream->write('Yay!');
     }
 
     #[DataProvider('provideAttributesAndHeaders')]
     public function testMockServerRequest($attributes, $headers)
     {
-        $request = $this->mockServerRequest($attributes, $headers);
+        $sut = new class('test') extends TestCase {
+            use MockPsr7MessagesTrait;
+        };
+        $request = $sut->mockServerRequest($attributes, $headers);
 
         $this->assertInstanceOf(ServerRequestInterface::class, $request);
 
@@ -88,11 +89,15 @@ class MockPsr7MessagesTraitTest extends TestCase
     #[DataProvider('provideReponseStatusCodes')]
     public function testMockResponse($status, $body)
     {
+        $sut = new class('test') extends TestCase {
+            use MockPsr7MessagesTrait;
+        };
+
         if (is_null($status)) {
-            $response = $this->mockResponse();
+            $response = $sut->mockResponse();
             $status = 200;
         } else {
-            $response = $this->mockResponse($status, $body);
+            $response = $sut->mockResponse($status, $body);
         }
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
@@ -102,9 +107,11 @@ class MockPsr7MessagesTraitTest extends TestCase
     public static function provideReponseStatusCodes()
     {
         $body = 'string';
-        $stream_mock = (new Prophecy\Prophet())->prophesize(StreamInterface::class);
-        $stream_mock->__toString()->willReturn($body);
-        $stream = $stream_mock->reveal();
+        $factory = new class('factory') extends TestCase {
+            use MockPsr7MessagesTrait;
+        };
+        $stream = $factory->createMock(StreamInterface::class);
+        $stream->method('__toString')->willReturn($body);
 
         return [
             'Response with 200, with body string' => [200, $body],

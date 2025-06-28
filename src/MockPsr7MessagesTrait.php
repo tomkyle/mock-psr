@@ -11,8 +11,7 @@
 
 namespace tomkyle\MockPsr;
 
-use Nyholm;
-use Prophecy;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -21,63 +20,150 @@ use Psr\Http\Message\UriInterface;
 
 trait MockPsr7MessagesTrait
 {
-    public function mockServerRequest(array $attributes = [], array $headers = []): ServerRequestInterface
+    /**
+     * Create a mock PSR-7 RequestInterface.
+     *
+     * Sets getMethod() and getUri() behavior.
+     *
+     * Usage:
+     *
+     * <code>
+     * $request = $this->mockRequest('POST', '/endpoint');
+     * $request->getMethod(); // 'POST'
+     * $request->getUri();    // UriInterface mock for '/endpoint'
+     * </code>
+     *
+     * @param string $method HTTP method for the request
+     * @param string $uri    URI string for the request
+     *
+     * @return RequestInterface a PSR-7 request mock
+     */
+    public function mockRequest(string $method = 'GET', string $uri = '/'): RequestInterface
     {
-        $objectProphecy = (new Prophecy\Prophet())->prophesize(ServerRequestInterface::class);
+        /** @var MockObject&RequestInterface $request */
+        $request = $this->createMock(RequestInterface::class);
+        $request->method('getMethod')->willReturn($method);
+        $request->method('getUri')->willReturn($this->mockUri($uri));
 
-        foreach ($attributes as $name => $value) {
-            $objectProphecy->getAttribute(Prophecy\Argument::exact($name))->willReturn($value);
-        }
-
-        foreach ($headers as $name => $value) {
-            $objectProphecy->getHeaderLine(Prophecy\Argument::exact($name))->willReturn($value);
-        }
-
-        return $objectProphecy->reveal();
+        return $request;
     }
 
-    public function mockUri($uri): UriInterface
-    {
-        return is_string($uri)
-        ? (new Nyholm\Psr7\Factory\Psr17Factory())->createUri($uri)
-        : $uri;
-    }
-
-    public function mockRequest(string $method, $uri): RequestInterface
-    {
-        $uri = $this->mockUri($uri);
-
-        $objectProphecy = (new Prophecy\Prophet())->prophesize(RequestInterface::class);
-        $objectProphecy->getMethod()->willReturn($method);
-        $objectProphecy->getUri()->willReturn($uri);
-
-        return $objectProphecy->reveal();
-    }
-
-    public function mockStream(string $body = '', array $options = []): StreamInterface
-    {
-        $objectProphecy = (new Prophecy\Prophet())->prophesize(StreamInterface::class);
-        $objectProphecy->__toString()->willReturn($body);
-
-        if ($options['write'] ?? false) {
-            $objectProphecy->write(Prophecy\Argument::type('string'))->shouldBeCalled();
-        }
-
-        return $objectProphecy->reveal();
-    }
-
+    /**
+     * Create a mock PSR-7 ResponseInterface.
+     *
+     * Configures getStatusCode() and optionally getBody().
+     *
+     * Usage:
+     *
+     * <code>
+     * $stream = $this->mockStream('content');
+     * $response = $this->mockResponse(404, $stream);
+     * $response->getStatusCode(); // 404
+     * $response->getBody()->getContents(); // 'content'
+     * </code>
+     *
+     * @param int                         $status HTTP status code
+     * @param null|StreamInterface|string $body   body content or stream
+     *
+     * @return ResponseInterface a mock PSR-7 response
+     */
     public function mockResponse(int $status = 200, $body = null): ResponseInterface
     {
-        $objectProphecy = (new Prophecy\Prophet())->prophesize(ResponseInterface::class);
-        $objectProphecy->getStatusCode()->willReturn($status);
+        /** @var MockObject&ResponseInterface $response */
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn($status);
 
-        if ($body instanceof StreamInterface) {
-            $objectProphecy->getBody()->willReturn($body);
-        } elseif (is_string($body)) {
-            $stream = $this->mockStream($body);
-            $objectProphecy->getBody()->willReturn($stream);
+        if (null !== $body) {
+            $stream = is_string($body) ? $this->mockStream($body) : $body;
+            $response->method('getBody')->willReturn($stream);
         }
 
-        return $objectProphecy->reveal();
+        return $response;
+    }
+
+    /**
+     * Create a mock PSR-7 ServerRequestInterface.
+     *
+     * Configures getAttribute() and getHeaderLine() based on provided arrays.
+     *
+     * Usage:
+     *
+     * <code>
+     * $request = $this->mockServerRequest(['user' => $user], ['Accept' => 'application/json']);
+     * $request->getAttribute('user'); // $user
+     * $request->getHeaderLine('Accept'); // 'application/json'
+     * </code>
+     *
+     * @param array<string, mixed>  $attributes attributes to return
+     * @param array<string, string> $headers    headers to return
+     *
+     * @return ServerRequestInterface a mock server request
+     */
+    public function mockServerRequest(array $attributes = [], array $headers = []): ServerRequestInterface
+    {
+        /** @var MockObject&ServerRequestInterface $request */
+        $request = $this->createMock(ServerRequestInterface::class);
+
+        $request->method('getAttribute')->willReturnCallback(fn (string $name, $default = null) => $attributes[$name] ?? $default);
+
+        $request->method('getHeaderLine')->willReturnCallback(fn (string $name) => $headers[$name] ?? '');
+
+        return $request;
+    }
+
+    /**
+     * Create a mock PSR-7 StreamInterface.
+     *
+     * Configures __toString() and getContents(), and optionally write().
+     *
+     * Usage:
+     *
+     * <code>
+     * $stream = $this->mockStream('data', ['write' => true]);
+     * $stream->write('abc'); // returns length of 'data'
+     * </code>
+     *
+     * @param string              $content content to return when reading the stream
+     * @param array<string, bool> $methods Options to enable extra methods (e.g. 'write' => true).
+     *
+     * @return StreamInterface a mock stream
+     */
+    public function mockStream(string $content = '', array $methods = []): StreamInterface
+    {
+        /** @var MockObject&StreamInterface $stream */
+        $stream = $this->createMock(StreamInterface::class);
+        $stream->method('__toString')->willReturn($content);
+        $stream->method('getContents')->willReturn($content);
+
+        if (isset($methods['write']) && $methods['write']) {
+            $stream->method('write')->willReturn(strlen($content));
+        }
+
+        return $stream;
+    }
+
+    /**
+     * Create a mock PSR-7 UriInterface.
+     *
+     * Configures __toString() to return specified URI string.
+     *
+     * Usage:
+     *
+     * <code>
+     * $uri = $this->mockUri('https://example.com');
+     * (string) $uri; // 'https://example.com'
+     * </code>
+     *
+     * @param string $uri URI string to return
+     *
+     * @return UriInterface a mock URI
+     */
+    public function mockUri(string $uri = '/'): UriInterface
+    {
+        /** @var MockObject&UriInterface $uriMock */
+        $uriMock = $this->createMock(UriInterface::class);
+        $uriMock->method('__toString')->willReturn($uri);
+
+        return $uriMock;
     }
 }

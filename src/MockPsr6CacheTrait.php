@@ -11,93 +11,135 @@
 
 namespace tomkyle\MockPsr;
 
-use Prophecy;
-use Psr\Cache;
+use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 trait MockPsr6CacheTrait
 {
     /**
-     * @var string
+     * Create a mock PSR-6 CacheItemInterface.
+     *
+     * Returns a mock cache item with a specified stored value and hit status.
+     *
+     * Usage:
+     *
+     * <code>
+     * $item = $this->mockCacheItem('value', ['isHit' => true, 'getKey' => true]);
+     * $item->get(); // 'value'
+     * $item->isHit(); // true
+     * </code>
+     *
+     * @param mixed $value   value to be returned by get()
+     * @param array $options optional settings: 'isHit' => bool, 'getKey' => bool
+     *
+     * @return CacheItemInterface a PSR-6 cache item mock
      */
-    protected $default_key_name = 'keyname';
+    public function mockCacheItem($value = null, array $options = []): CacheItemInterface
+    {
+        /** @var CacheItemInterface&MockObject $item */
+        $item = $this->createMock(CacheItemInterface::class);
+
+        $item->method('get')->willReturn($value);
+        $item->method('isHit')->willReturn($options['isHit'] ?? true);
+
+        if (isset($options['getKey'])) {
+            $item->method('getKey')->willReturn('test-key');
+        }
+
+        $item->method('set')->willReturnSelf();
+        $item->method('expiresAt')->willReturnSelf();
+        $item->method('expiresAfter')->willReturnSelf();
+
+        return $item;
+    }
 
     /**
-     * @param array|CacheItemPoolInterface $cache_item
-     * @param array                        $options    CacheItemPool configuration
+     * Create a mock PSR-6 CacheItemInterface for a missing cache entry.
+     *
+     * Returns a mock cache item where isHit() is false and get() returns null.
+     *
+     * Usage:
+     *
+     * <code>
+     * $item = $this->mockMissingCacheItem('foo');
+     * $item->isHit(); // false
+     * $item->get(); // null
+     * $item->getKey(); // 'foo'
+     * </code>
+     *
+     * @param string $key cache key for the item
+     *
+     * @return CacheItemInterface a cache miss item mock
      */
-    public function mockCacheItemPool($cache_item = null, array $options = [])
+    public function mockMissingCacheItem(string $key = 'missing'): CacheItemInterface
     {
-        $objectProphecy = (new Prophecy\Prophet())->prophesize(Cache\CacheItemPoolInterface::class);
+        /** @var CacheItemInterface&MockObject $item */
+        $item = $this->createMock(CacheItemInterface::class);
 
-        if ($cache_item instanceof Cache\CacheItemInterface) {
-            $key = $cache_item->getKey();
-            $key = ($key !== $this->default_key_name)
-                 ? Prophecy\Argument::exact($key) : Prophecy\Argument::type('string');
+        $item->method('isHit')->willReturn(false);
+        $item->method('get')->willReturn(null);
+        $item->method('getKey')->willReturn($key);
+        $item->method('set')->willReturnSelf();
+        $item->method('expiresAt')->willReturnSelf();
+        $item->method('expiresAfter')->willReturnSelf();
 
-            $objectProphecy->getItem($key)->willReturn($cache_item);
-            $objectProphecy->hasItem($key)->willReturn(true);
-        } elseif (is_array($cache_item)) {
-            foreach ($cache_item as $key => $item) {
-                if (!$item instanceof Cache\CacheItemInterface) {
-                    $item = $this->mockCacheItem($item, ['getKey' => $key]);
+        return $item;
+    }
+
+    /**
+     * Create a mock PSR-6 CacheItemPoolInterface.
+     *
+     * Returns a mock cache pool that will return specified items or cache misses.
+     *
+     * Usage:
+     *
+     * <code>
+     * $pool = $this->mockCacheItemPool(['foo' => 'bar'], ['clear' => false]);
+     * $pool->getItem('foo')->get(); // 'bar'
+     * $pool->hasItem('baz'); // false
+     * </code>
+     *
+     * @param null|array|CacheItemInterface $items   array of key => value or a CacheItemInterface instance
+     * @param array                         $options optional settings: 'clear' => bool for clear() behavior
+     *
+     * @return CacheItemPoolInterface a PSR-6 cache pool mock
+     */
+    public function mockCacheItemPool($items = null, array $options = []): CacheItemPoolInterface
+    {
+        /** @var CacheItemPoolInterface&MockObject $pool */
+        $pool = $this->createMock(CacheItemPoolInterface::class);
+
+        if (is_array($items)) {
+            $pool->method('hasItem')->willReturnCallback(fn (string $key) => array_key_exists($key, $items));
+
+            $pool->method('getItem')->willReturnCallback(function (string $key) use ($items) {
+                if (array_key_exists($key, $items)) {
+                    $value = $items[$key];
+                    if ($value instanceof CacheItemInterface) {
+                        return $value;
+                    }
+
+                    return $this->mockCacheItem($value);
                 }
 
-                $key = $item->getKey();
-                $objectProphecy->getItem(Prophecy\Argument::exact($key))->willReturn($item);
-                $objectProphecy->hasItem(Prophecy\Argument::exact($key))->willReturn(true);
-            }
-        } elseif ($cache_item) {
-            throw new \InvalidArgumentException('CacheItemInterface expected');
+                return $this->mockMissingCacheItem($key);
+            });
+        } elseif ($items instanceof CacheItemInterface) {
+            $pool->method('hasItem')->willReturn(true);
+            $pool->method('getItem')->willReturn($items);
+        } else {
+            $pool->method('hasItem')->willReturn(false);
+            $pool->method('getItem')->willReturnCallback(fn (string $key) => $this->mockMissingCacheItem($key));
         }
 
-        if ($options['save'] ?? false) {
-            $objectProphecy->save(Prophecy\Argument::type(Cache\CacheItemInterface::class))->shouldBeCalled();
-        }
+        $pool->method('save')->willReturn(true);
+        $pool->method('saveDeferred')->willReturn(true);
+        $pool->method('commit')->willReturn(true);
+        $pool->method('deleteItem')->willReturn(true);
+        $pool->method('deleteItems')->willReturn(true);
+        $pool->method('clear')->willReturn($options['clear'] ?? true);
 
-        if (isset($options['clear'])) {
-            $objectProphecy->clear()->shouldBeCalled()->willReturn((bool) $options['clear']);
-        }
-
-        if (isset($options['hasItem'])) {
-            $objectProphecy->hasItem(Prophecy\Argument::type('string'))->willReturn((bool) $options['hasItem']);
-        }
-
-        return $objectProphecy->reveal();
-    }
-
-    public function mockCacheItem($item_content, array $options = [])
-    {
-        $objectProphecy = (new Prophecy\Prophet())->prophesize(Cache\CacheItemInterface::class);
-        $objectProphecy->get()->willReturn($item_content);
-
-        // if ($get_value = $options['getKey'] ?? false):
-        $objectProphecy->getKey()->willReturn($options['getKey'] ?? $this->default_key_name);
-        // endif;
-
-        if (isset($options['isHit'])) {
-            $isHit = (bool) $options['isHit'];
-            $objectProphecy->isHit()->willReturn($isHit);
-        }
-
-        if (isset($options['set'])) {
-            $set_value = $options['set'] ?? false;
-            $set_value = is_string($set_value) ? $set_value : Prophecy\Argument::type('string');
-            $objectProphecy->set($set_value)->willReturn($objectProphecy);
-        }
-
-        if (isset($options['expiresAfter'])) {
-            $expires_value = $options['expiresAfter'];
-            $expires_value = is_int($expires_value) ? $expires_value : Prophecy\Argument::type('int');
-            $objectProphecy->expiresAfter($expires_value)->willReturn($objectProphecy);
-        }
-
-        return $objectProphecy->reveal();
-    }
-
-    public function mockMissingCacheItem($item_content, array $options = [])
-    {
-        return $this->mockCacheItem($item_content, array_merge($options, [
-            'isHit' => false,
-        ]));
+        return $pool;
     }
 }

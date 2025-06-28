@@ -18,19 +18,15 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use tomkyle\MockPsr\MockPsr17FactoriesTrait;
 
-/**
- * @internal
- *
- * @coversNothing
- */
+
 class MockPsr17FactoriesTraitTest extends TestCase
 {
-    // SUT
-    use MockPsr17FactoriesTrait;
-
     public function testMockRequestFactory()
     {
-        $factory = $this->mockRequestFactory();
+        $sut = new class('test') extends TestCase {
+            use MockPsr17FactoriesTrait;
+        };
+        $factory = $sut->mockRequestFactory();
         $this->assertInstanceOf(RequestFactoryInterface::class, $factory);
 
         $request = $factory->createRequest('GET', '/');
@@ -39,7 +35,10 @@ class MockPsr17FactoriesTraitTest extends TestCase
 
     public function testMockResponseFactory()
     {
-        $factory = $this->mockResponseFactory();
+        $sut = new class('test') extends TestCase {
+            use MockPsr17FactoriesTrait;
+        };
+        $factory = $sut->mockResponseFactory();
         $this->assertInstanceOf(ResponseFactoryInterface::class, $factory);
 
         $response = $factory->createResponse();
