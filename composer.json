@@ -1,6 +1,6 @@
 {
 	"name": "tomkyle/mock-psr",
-	"description": "Traits for mocking common PSR components in PhpUnit tests",
+	"description": "Mock common PSR standard components in PhpUnit tests",
 	"keywords": [
     "phpunit",
     "mock",
