@@ -1,7 +1,11 @@
 <h1 align="center">tomkyle · Mock PSR</h1>
 
 **Effortless PHPUnit mocks for common PSR interfaces – no more boilerplate, just clean tests.**
-[![PHP Composer](https://github.com/tomkyle/mock-psr/actions/workflows/php.yml/badge.svg)](https://github.com/tomkyle/mock-psr/actions/workflows/php.yml)
+
+[![Packagist](https://img.shields.io/packagist/v/tomkyle/mock-psr.svg?style=flat)](https://packagist.org/packages/tomkyle/mock-psr)
+[![PHP version](https://img.shields.io/packagist/php-v/tomkyle/mock-psr.svg)](https://packagist.org/packages/tomkyle/mock-psr)
+[![PHP Composer](https://github.com/tomkyle/mock-psr/actions/workflows/php.yml/badge.svg)](https://github.com/tomkyle/mock-psr/actions/workflows/php.yml) 
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
 
 ---
 
